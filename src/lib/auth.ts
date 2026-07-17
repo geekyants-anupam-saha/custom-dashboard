@@ -12,7 +12,7 @@ const secret = new TextEncoder().encode(
 );
 
 export function isValidEmail(email: string) {
-  return /^[A-Za-z0-9._%+-]+@geekyants\.com$/i.test(email);
+  return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/i.test(email);
 }
 
 export function generateOtp() {
