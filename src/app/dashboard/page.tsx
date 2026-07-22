@@ -3,100 +3,62 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  Bookmark,
+  Clock3,
+  Eye,
+  Gamepad2,
+  Sprout,
+  UsersRound,
+} from "lucide-react";
+
 import styles from "./page.module.scss";
 
 import { AppDispatch, RootState } from "@/lib/store";
-import {
-  clearAuth,
-  setLoading,
-  setUser,
-} from "@/lib/features/auth/authSlice";
+import { clearAuth, setLoading, setUser } from "@/lib/features/auth/authSlice";
+
+import DashboardHeader from "./components/DashboardHeader";
+import StatsCard from "./components/StatsCard";
+import HighlightCard from "./components/HighlightCard";
+
+interface DashboardData {
+  instagram: {
+    followersCount: number;
+    mostViewedPost: {
+      caption: string;
+      image: string;
+      permalink: string;
+      views: number;
+      totalSaves: number;
+    } | null;
+  };
+  game: {
+    seedPlanted: {
+      count: number;
+    };
+    webPlaythroughs: number | null;
+  };
+  mostViewedArticle: any;
+}
 
 export default function DashboardPage() {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
-  const { user, status } = useSelector(
-    (state: RootState) => state.auth
+  const { user, status } = useSelector((state: RootState) => state.auth);
+
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null,
   );
 
-  const [instagramConnected, setInstagramConnected] =
-    useState(false);
-
-  const [instagramLoading, setInstagramLoading] =
-    useState(true);
-
-  const [followersCount, setFollowersCount] =
-    useState<number | null>(null);
-
-  const [mediaCount, setMediaCount] =
-    useState<number | null>(null);
-
-  const fetchInstagramStats = async () => {
-    try {
-      const response = await fetch(
-        "/api/instagram/followers_count"
-      );
-
-      if (!response.ok) {
-        throw new Error("Unable to load Instagram stats");
-      }
-
-      const data = await response.json();
-
-      setFollowersCount(
-        data.followers_count ?? null
-      );
-
-      setMediaCount(
-        data.media_count ?? null
-      );
-    } catch (err) {
-      console.error(err);
-
-      setFollowersCount(null);
-      setMediaCount(null);
-    }
-  };
-
-  const fetchInstagramStatus = async () => {
-    try {
-      const response = await fetch(
-        "/api/auth/facebook/status"
-      );
-
-      const data = await response.json();
-
-      const connected = Boolean(data.connected);
-
-      setInstagramConnected(connected);
-
-      if (connected) {
-        await fetchInstagramStats();
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setInstagramLoading(false);
-    }
-  };
-
-  const connectInstagram = () => {
-    window.open(
-      "/api/auth/facebook",
-      "instagram-auth",
-      "width=600,height=700"
-    );
-  };
+  const [dashboardLoading, setDashboardLoading] = useState(true);
 
   useEffect(() => {
     const loadSession = async () => {
       dispatch(setLoading(true));
 
       try {
-        const response = await fetch(
-          "/api/auth/session"
-        );
+        const response = await fetch("/api/auth/session");
 
         if (!response.ok) {
           dispatch(clearAuth());
@@ -119,37 +81,24 @@ export default function DashboardPage() {
   }, [dispatch, router]);
 
   useEffect(() => {
-    fetchInstagramStatus();
+    fetchDashboard();
   }, []);
 
-  useEffect(() => {
-    const handler = async (
-      event: MessageEvent
-    ) => {
-      if (
-        event.data?.type !==
-        "INSTAGRAM_CONNECTED"
-      ) {
-        return;
-      }
+  const fetchDashboard = async () => {
+    try {
+      setDashboardLoading(true);
 
-      setInstagramConnected(true);
+      const res = await fetch("/api/dashboard");
 
-      await fetchInstagramStats();
-    };
+      const data = await res.json();
 
-    window.addEventListener(
-      "message",
-      handler
-    );
-
-    return () => {
-      window.removeEventListener(
-        "message",
-        handler
-      );
-    };
-  }, []);
+      setDashboardData(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDashboardLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
     dispatch(setLoading(true));
@@ -165,88 +114,90 @@ export default function DashboardPage() {
     dispatch(setLoading(false));
   };
 
-  if (status === "loading") {
-    return (
-      <div className={styles.pageShell}>
-        <p>Loading WoU Dashboard…</p>
-      </div>
-    );
+  if (status === "loading" || dashboardLoading) {
+    return <main className={styles.loading}>Loading Dashboard...</main>;
   }
 
-  if (!user) return null;
+  if (!user || !dashboardData) return null;
 
   return (
-    <main className={styles.pageShell}>
-      <section
-        className={`${styles.card} ${styles.large}`}
-      >
-        <div className={styles.cardHeader}>
-          <div>
-            <p className={styles.eyebrow}>
-              WoU Dashboard
-            </p>
+    <>
+      <DashboardHeader onLogout={handleLogout} />
 
-            <h1>Welcome back</h1>
-          </div>
+      <main className={styles.container}>
+        {/* Top Stats */}
 
-          <button
-            className={`${styles.button} ${styles.secondary}`}
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
-        </div>
+        <section className={styles.statsGrid}>
+          <StatsCard
+            title="Seeds Planted"
+            value={dashboardData.game.seedPlanted.count}
+            growth={8.4}
+            growthType="positive"
+            icon={<Sprout />}
+          />
 
-        <p className={styles.muted}>
-          Signed in as {user.email}
-        </p>
+          <StatsCard
+            title="Web Playthroughs"
+            value={12490}
+            growth={5.6}
+            growthType="positive"
+            icon={<Gamepad2 />}
+          />
 
-        <div className={styles.statsGrid}>
-          <article className={styles.statCard}>
-            <h2>Observers</h2>
-            <p>24 active</p>
-          </article>
+          <StatsCard
+            title="Follower Count"
+            value={dashboardData.instagram.followersCount}
+            growth={2.1}
+            growthType="positive"
+            icon={<UsersRound />}
+          />
+        </section>
 
-          <article className={styles.statCard}>
-            <h2>Reports</h2>
-            <p>12 pending review</p>
-          </article>
+        {/* Bottom Cards */}
 
-          <article className={styles.statCard}>
-            <h2>Instagram</h2>
+        <section className={styles.highlightGrid}>
+          {dashboardData.instagram.mostViewedPost && (
+            <HighlightCard
+              title="Most Viewed Post"
+              image={dashboardData.instagram.mostViewedPost.image}
+              avatar="/instagram.png"
+              username="@worldofus"
+              subText="2 days ago"
+              heading="Secrets of the Grove."
+              stats={[
+                {
+                  icon: <Eye size={18} />,
+                  value: dashboardData.instagram.mostViewedPost.views,
+                  label: "VIEWS",
+                },
+                {
+                  icon: <Bookmark size={18} />,
+                  value: dashboardData.instagram.mostViewedPost.totalSaves,
+                  label: "SAVES",
+                },
+              ]}
+            />
+          )}
 
-            {instagramLoading ? (
-              <p className={styles.muted}>
-                Checking connection…
-              </p>
-            ) : instagramConnected ? (
-              <>
-                <p className={styles.muted}>
-                  Followers:{" "}
-                  {followersCount ?? "—"}
-                </p>
-
-                <p className={styles.muted}>
-                  Posts: {mediaCount ?? "—"}
-                </p>
-              </>
-            ) : (
-              <>
-                <p className={styles.muted}>
-                  Not connected yet
-                </p>
-
-                <button
-                  className={`${styles.button} ${styles.primary}`}
-                  onClick={connectInstagram}
-                >
-                  Connect Instagram
-                </button>
-              </>
-            )}
-          </article>
-        </div>
-      </section>
-    </main>
+          <HighlightCard
+            title="Most Read Article"
+            image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhpsRqRbfNEh8Lu3LjvAFysdyCETF-qQnQGavfk9Ymdh1DGleOLkDbuc8&s=10"
+            heading="The Myth of the Stone Guardians"
+            stats={[
+              {
+                icon: <Eye size={18} />,
+                value: "876",
+                label: "VIEWS",
+              },
+              {
+                icon: <Clock3 size={18} />,
+                value: "4 MINS",
+                label: "AVG TIME SPENT",
+              },
+            ]}
+          />
+        </section>
+      </main>
+    </>
   );
 }
