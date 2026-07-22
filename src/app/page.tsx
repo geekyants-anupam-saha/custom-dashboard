@@ -44,7 +44,7 @@ export default function HomePage() {
 
       sessionStorage.setItem("email", email.trim());
 
-      router.push("/otp");
+      router.push("/verify-otp");
     } catch (error) {
       dispatch(
         setError(error instanceof Error ? error.message : "Failed to send OTP"),

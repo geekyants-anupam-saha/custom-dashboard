@@ -10,7 +10,9 @@ export async function POST(request: Request) {
 
     if (!isValidEmail(email)) {
       return NextResponse.json(
-        { error: "Please enter a valid email ending with @geekyants.com." },
+        {
+          error: "Please enter a valid email ending with @geekyants.com.",
+        },
         { status: 400 }
       );
     }
@@ -18,9 +20,14 @@ export async function POST(request: Request) {
     const otp = generateOtp();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
     if (!existingUser) {
-      await prisma.user.create({ data: { email } });
+      await prisma.user.create({
+        data: { email },
+      });
     }
 
     await prisma.otpVerification.upsert({
@@ -29,11 +36,25 @@ export async function POST(request: Request) {
       create: { email, otp, expiresAt },
     });
 
-    const res = await sendOtpEmail(email, otp);
+    const result = await sendOtpEmail(email, otp);
 
-    return NextResponse.json(res);
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "OTP sent successfully",
+    });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Unable to send OTP" }, { status: 500 });
+
+    return NextResponse.json(
+      { error: "Unable to send OTP" },
+      { status: 500 }
+    );
   }
 }
