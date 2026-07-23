@@ -12,7 +12,8 @@ interface HighlightCardProps {
   title: string;
   image: string;
 
-  heading: string;
+  heading?: string;
+  postLink?: string;
 
   description?: string;
 
@@ -29,6 +30,7 @@ export default function HighlightCard({
   title,
   image,
   heading,
+  postLink,
   description,
   avatar,
   username,
@@ -39,15 +41,18 @@ export default function HighlightCard({
     <article className={styles.card}>
       <h2 className={styles.cardTitle}>{title}</h2>
 
-      <div className={styles.imageWrapper}>
-        <img src={image} alt={heading} className={styles.image} />
+      <div
+        className={styles.imageWrapper}
+        onClick={() => window.open(postLink, "_blank")}
+      >
+        <img src={image} alt={heading || ""} className={styles.image} />
       </div>
 
       <div className={styles.bottom}>
         {(avatar || username) && (
           <div className={styles.user}>
             {avatar && (
-              <img
+              <Image
                 src={avatar}
                 alt={username ?? ""}
                 width={56}

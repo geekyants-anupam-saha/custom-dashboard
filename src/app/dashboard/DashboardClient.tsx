@@ -1,9 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-
 import {
   Bookmark,
   Clock3,
@@ -15,95 +12,48 @@ import {
 
 import styles from "./page.module.scss";
 
-import { AppDispatch, RootState } from "@/lib/store";
-import { clearAuth, setLoading, setUser } from "@/lib/features/auth/authSlice";
-
 import DashboardHeader from "./components/DashboardHeader";
 import StatsCard from "./components/StatsCard";
 import HighlightCard from "./components/HighlightCard";
+import { getTimeAgo } from "../../../utils";
 
-interface DashboardData {
-  instagram: {
-    followersCount: number;
-    mostViewedPost: {
-      caption: string;
-      image: string;
-      permalink: string;
-      views: number;
-      totalSaves: number;
-    } | null;
-  };
-
-  game: {
-    seedPlanted: {
-      count: number;
+interface DashboardPageProps {
+  dashboardData: {
+    instagram: {
+      followersCount: number;
+      mostViewedPost: {
+        caption: string;
+        image: string;
+        permalink: string;
+        views: number;
+        totalSaves: number;
+        timestamp: string;
+      } | null;
     };
-    webPlaythroughs: number | null;
+    game: {
+      seedPlanted: {
+        count: number;
+      };
+      webPlaythroughs: number | null;
+    };
   };
-
-  mostViewedArticle: unknown;
+  mostViewedArticle: any;
 }
 
-interface DashboardClientProps {
-  dashboardData: DashboardData;
-}
-
-export default function DashboardClient({
+export default function DashboardPage({
   dashboardData,
-}: DashboardClientProps) {
+  mostViewedArticle,
+}: DashboardPageProps) {
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
-
-  const { user, status } = useSelector((state: RootState) => state.auth);
-
-  useEffect(() => {
-    const loadSession = async () => {
-      dispatch(setLoading(true));
-
-      try {
-        const response = await fetch("/api/auth/session");
-
-        if (!response.ok) {
-          dispatch(clearAuth());
-          router.replace("/");
-          return;
-        }
-
-        const data = await response.json();
-
-        dispatch(setUser(data.user));
-      } catch {
-        dispatch(clearAuth());
-        router.replace("/");
-      } finally {
-        dispatch(setLoading(false));
-      }
-    };
-
-    loadSession();
-  }, [dispatch, router]);
 
   const handleLogout = async () => {
-    dispatch(setLoading(true));
-
     await fetch("/api/auth/logout", {
       method: "POST",
     });
 
-    dispatch(clearAuth());
-
     router.replace("/");
-
-    dispatch(setLoading(false));
+    router.refresh();
   };
-
-  if (status === "loading") {
-    return <main className={styles.loading}>Loading Dashboard...</main>;
-  }
-
-  if (!user) {
-    return null;
-  }
 
   return (
     <>
@@ -114,24 +64,18 @@ export default function DashboardClient({
           <StatsCard
             title="Seeds Planted"
             value={dashboardData.game.seedPlanted.count}
-            growth={8.4}
-            growthType="positive"
             icon={<Sprout />}
           />
 
           <StatsCard
             title="Web Playthroughs"
             value={dashboardData.game.webPlaythroughs ?? 0}
-            growth={5.6}
-            growthType="positive"
             icon={<Gamepad2 />}
           />
 
           <StatsCard
             title="Follower Count"
             value={dashboardData.instagram.followersCount}
-            growth={2.1}
-            growthType="positive"
             icon={<UsersRound />}
           />
         </section>
@@ -141,10 +85,13 @@ export default function DashboardClient({
             <HighlightCard
               title="Most Viewed Post"
               image={dashboardData.instagram.mostViewedPost.image}
-              avatar="/instagram.png"
+              avatar="/instagram.avif"
               username="@worldofus"
-              subText="2 days ago"
-              heading="Secrets of the Grove."
+              subText={getTimeAgo(
+                dashboardData.instagram.mostViewedPost.timestamp,
+              )}
+              description={dashboardData.instagram.mostViewedPost.caption}
+              postLink={dashboardData.instagram.mostViewedPost.permalink}
               stats={[
                 {
                   icon: <Eye size={18} />,
@@ -160,23 +107,36 @@ export default function DashboardClient({
             />
           )}
 
-          <HighlightCard
-            title="Most Read Article"
-            image="..."
-            heading="The Myth of the Stone Guardians"
-            stats={[
-              {
-                icon: <Eye size={18} />,
-                value: "876",
-                label: "VIEWS",
-              },
-              {
-                icon: <Clock3 size={18} />,
-                value: "4 MINS",
-                label: "AVG TIME SPENT",
-              },
-            ]}
-          />
+          {mostViewedArticle && (
+            <HighlightCard
+              title="Most Read Article"
+              image={
+                mostViewedArticle.attributes.CoverImg?.data?.attributes?.url
+              }
+              heading={mostViewedArticle.attributes.Title}
+              description={
+                mostViewedArticle.attributes.ShortDes?.replace(
+                  /<[^>]*>/g,
+                  "",
+                ) ?? ""
+              }
+              postLink={`${process.env.NEXT_PUBLIC_URL}${mostViewedArticle.pagePath}`}
+              stats={[
+                {
+                  icon: <Eye size={18} />,
+                  value: mostViewedArticle.pageViews,
+                  label: "VIEWS",
+                },
+                {
+                  icon: <Clock3 size={18} />,
+                  value: `${Math.floor(
+                    mostViewedArticle.averageSessionDuration / 60,
+                  )} MINS`,
+                  label: "AVG TIME",
+                },
+              ]}
+            />
+          )}
         </section>
       </main>
     </>
