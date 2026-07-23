@@ -1,6 +1,7 @@
 "use client";
 
 import { CalendarDays, ChevronDown, LogOut } from "lucide-react";
+import { useRive } from "@rive-app/react-canvas";
 import styles from "./DashboardHeader.module.scss";
 
 interface DashboardHeaderProps {
@@ -8,10 +9,24 @@ interface DashboardHeaderProps {
 }
 
 export default function DashboardHeader({ onLogout }: DashboardHeaderProps) {
+  const { RiveComponent } = useRive({
+    src: "/wou-logo-2.riv",
+    stateMachines: "State Machine 1",
+    autoplay: true,
+  });
+
   return (
     <header className={styles.header}>
       <div className={styles.left}>
-        <img src="/logo.svg" alt="World of Us" className={styles.logo} />
+        <div
+          style={{
+            width: 160,
+            height: 60,
+            cursor: "pointer",
+          }}
+        >
+          <RiveComponent />
+        </div>
       </div>
 
       <div className={styles.right}>

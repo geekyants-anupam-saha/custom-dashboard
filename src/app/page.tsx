@@ -1,28 +1,39 @@
 "use client";
 
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.scss";
 
-import { AppDispatch, RootState } from "@/lib/store";
-import { setError } from "@/lib/features/auth/authSlice";
-
 export default function HomePage() {
-  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  const { error } = useSelector((state: RootState) => state.auth);
-
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const [isSendingOtp, setIsSendingOtp] = useState(false);
 
-  const handleSendOtp = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSendOtp = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
 
     if (isSendingOtp) return;
 
-    dispatch(setError(null));
+    setError("");
+
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
+      setError("Please enter your email address.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(trimmedEmail)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
     setIsSendingOtp(true);
 
     try {
@@ -32,22 +43,24 @@ export default function HomePage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: email.trim(),
+          email: trimmedEmail,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Failed to send OTP");
+        throw new Error(data.error ?? "Failed to send OTP.");
       }
 
-      sessionStorage.setItem("email", email.trim());
+      sessionStorage.setItem("email", trimmedEmail);
 
       router.push("/verify-otp");
-    } catch (error) {
-      dispatch(
-        setError(error instanceof Error ? error.message : "Failed to send OTP"),
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
       );
     } finally {
       setIsSendingOtp(false);
@@ -75,12 +88,17 @@ export default function HomePage() {
             id="email"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (error) setError("");
+            }}
             placeholder="you@example.com"
             className={styles.input}
             disabled={isSendingOtp}
             required
           />
+
+          {error && <p className={styles.errorText}>{error}</p>}
 
           <button
             type="submit"
@@ -90,8 +108,6 @@ export default function HomePage() {
             {isSendingOtp ? "Sending OTP..." : "Send OTP"}
           </button>
         </form>
-
-        {error && <p className={styles.errorText}>{error}</p>}
       </section>
     </main>
   );

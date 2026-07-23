@@ -1,21 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.scss";
 
-import { AppDispatch, RootState } from "@/lib/store";
-import { setError, setUser } from "@/lib/features/auth/authSlice";
-
 export default function OtpPage() {
-  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-
-  const { error } = useSelector((state: RootState) => state.auth);
 
   const [otp, setOtp] = useState("");
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
 
   useEffect(() => {
@@ -29,12 +23,20 @@ export default function OtpPage() {
     setEmail(savedEmail);
   }, [router]);
 
-  const handleVerifyOtp = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleVerifyOtp = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
 
     if (isVerifyingOtp) return;
 
-    dispatch(setError(null));
+    setError("");
+
+    if (otp.trim().length !== 6) {
+      setError("Please enter a valid 6-digit OTP.");
+      return;
+    }
+
     setIsVerifyingOtp(true);
 
     try {
@@ -52,17 +54,17 @@ export default function OtpPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Failed to verify OTP");
+        throw new Error(data.error ?? "Failed to verify OTP.");
       }
-
-      dispatch(setUser(data.user));
 
       sessionStorage.removeItem("email");
 
       router.replace("/dashboard");
     } catch (err) {
-      dispatch(
-        setError(err instanceof Error ? err.message : "Failed to verify OTP"),
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
       );
     } finally {
       setIsVerifyingOtp(false);
@@ -89,13 +91,19 @@ export default function OtpPage() {
             id="otp"
             type="text"
             inputMode="numeric"
+            maxLength={6}
             placeholder="Enter 6-digit code"
             value={otp}
-            onChange={(e) => setOtp(e.target.value)}
+            onChange={(e) => {
+              setOtp(e.target.value.replace(/\D/g, ""));
+              if (error) setError("");
+            }}
             className={styles.input}
             disabled={isVerifyingOtp}
             required
           />
+
+          {error && <p className={styles.errorText}>{error}</p>}
 
           <button
             type="submit"
@@ -105,8 +113,6 @@ export default function OtpPage() {
             {isVerifyingOtp ? "Verifying..." : "Verify"}
           </button>
         </form>
-
-        {error && <p className={styles.errorText}>{error}</p>}
       </section>
     </main>
   );

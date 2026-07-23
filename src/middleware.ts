@@ -3,20 +3,37 @@ import { verifyJwt } from "@/lib/auth";
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("auth-token")?.value;
+  const pathname = request.nextUrl.pathname;
 
-  if (!token) {
-    return NextResponse.redirect(new URL("/", request.url));
+  if (pathname === "/") {
+    if (!token) {
+      return NextResponse.next();
+    }
+
+    const user = await verifyJwt(token);
+
+    if (user) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
+    return NextResponse.next();
   }
 
-  const user = await verifyJwt(token);
+  if (pathname.startsWith("/dashboard")) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
 
-  if (!user) {
-    return NextResponse.redirect(new URL("/", request.url));
+    const user = await verifyJwt(token);
+
+    if (!user) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/", "/dashboard/:path*"],
 };

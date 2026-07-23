@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { GoogleAuth } from "google-auth-library";
 
 const FB_PAGE_ACCESS_TOKEN = process.env.FB_PAGE_ACCESS_TOKEN!;
 const INSTAGRAM_ACCOUNT_ID = process.env.INSTAGRAM_ACCOUNT_ID!;
@@ -25,19 +26,15 @@ async function getInstagramData() {
 
     const account = await accountRes.json();
 
-    const allPosts: unknown[] = [];
+    const allPosts: any[] = [];
 
     let nextUrl: string | null =
       `https://graph.facebook.com/v23.0/${INSTAGRAM_ACCOUNT_ID}/media?fields=id,caption,media_url,thumbnail_url,media_type,permalink,timestamp,like_count,comments_count,insights.metric(views,saved)&limit=100&access_token=${FB_PAGE_ACCESS_TOKEN}`;
 
     while (nextUrl) {
-      const res: {
-        json(): unknown;
-        ok: boolean;
-        status: number;
-      } = await fetch(nextUrl, {
+      const res: any = await fetch(nextUrl, {
         next: {
-         revalidate: 86400,
+          revalidate: 86400,
         },
       });
 
@@ -45,8 +42,7 @@ async function getInstagramData() {
         throw new Error(`Instagram media API failed: ${res.status}`);
       }
 
-      const data: { data?: unknown[]; paging?: { next?: string } } =
-        await res.json();
+      const data = await res.json();
 
       allPosts.push(...(data.data ?? []));
 
@@ -58,20 +54,18 @@ async function getInstagramData() {
       caption: item.caption,
       mediaUrl: item.media_url,
       thumbnailUrl: item.thumbnail_url,
-      image: item.media_url || item.thumbnail_url,
+      image: item.media_type === "VIDEO" ? item.thumbnail_url : item.media_url,
       mediaType: item.media_type,
       permalink: item.permalink,
       timestamp: item.timestamp,
       likes: item.like_count ?? 0,
       comments: item.comments_count ?? 0,
       views:
-        item.insights?.data?.find(
-          (metric: { name: string }) => metric.name === "views",
-        )?.values?.[0]?.value ?? 0,
+        item.insights?.data?.find((metric: any) => metric.name === "views")
+          ?.values?.[0]?.value ?? 0,
       totalSaves:
-        item.insights?.data?.find(
-          (metric: { name: string }) => metric.name === "saved",
-        )?.values?.[0]?.value ?? 0,
+        item.insights?.data?.find((metric: any) => metric.name === "saved")
+          ?.values?.[0]?.value ?? 0,
     }));
 
     const mostViewedPost =
@@ -111,7 +105,7 @@ async function getSeedPlanted() {
     const data = await res.json();
 
     const planted = data.aggregates.find(
-      (item: { key: string }) => item.key === "planting.seedPlanted.count",
+      (item: any) => item.key === "planting.seedPlanted.count",
     );
 
     return {
@@ -130,19 +124,128 @@ async function getSeedPlanted() {
   }
 }
 
+async function getAnalyticsPageVisits() {
+  try {
+    const auth = new GoogleAuth({
+      credentials: {
+        client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY,
+      },
+      scopes: ["https://www.googleapis.com/auth/analytics.readonly"],
+    });
+
+    const client = await auth.getClient();
+    const { token } = await client.getAccessToken();
+
+    const res = await fetch(
+      `https://analyticsdata.googleapis.com/v1beta/properties/${process.env.GOOGLE_ANALYTICS_PROPERTY_ID}:runReport`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          dateRanges: [
+            {
+              startDate: "365daysAgo",
+              endDate: "today",
+            },
+          ],
+          dimensions: [{ name: "pagePath" }, { name: "pageTitle" }],
+          metrics: [
+            { name: "screenPageViews" },
+            { name: "userEngagementDuration" },
+            { name: "activeUsers" },
+          ],
+          orderBys: [
+            {
+              metric: {
+                metricName: "screenPageViews",
+              },
+              desc: true,
+            },
+          ],
+          limit: 100,
+        }),
+        next: {
+          revalidate: 86400,
+        },
+      },
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error(data);
+      return [];
+    }
+
+    return (
+      data.rows?.map((row: any) => {
+        const pageViews = Number(row.metricValues?.[0]?.value ?? 0);
+
+        const userEngagementDuration = Number(
+          row.metricValues?.[1]?.value ?? 0,
+        );
+
+        const activeUsers = Number(row.metricValues?.[2]?.value ?? 0);
+
+        return {
+          pagePath: row.dimensionValues?.[0]?.value ?? "",
+          pageTitle: row.dimensionValues?.[1]?.value ?? "",
+          pageViews,
+          averageEngagementPerActiveUser:
+            activeUsers > 0 ? userEngagementDuration / activeUsers : 0,
+        };
+      }) ?? []
+    );
+  } catch (err) {
+    console.error("Analytics error:", err);
+    return [];
+  }
+}
+
+async function getWebPlaythroughs() {
+  try {
+    const res = await fetch(METRICS_API, {
+      headers: {
+        "X-Metrics-Api-Token": METRICS_TOKEN,
+      },
+      next: {
+        revalidate: 86400,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Metrics API failed: ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    return data?.totalCount ?? 0;
+  } catch (err) {
+    console.error("Web playthroughs error:", err);
+    return 0;
+  }
+}
+
 async function fetchDashboardData() {
-  const [instagram, seedPlanted] = await Promise.all([
-    getInstagramData(),
-    getSeedPlanted(),
-  ]);
+  const [instagram, seedPlanted, analyticsPageVisits, webPlaythroughs] =
+    await Promise.all([
+      getInstagramData(),
+      getSeedPlanted(),
+      getAnalyticsPageVisits(),
+      getWebPlaythroughs(),
+    ]);
 
   return {
     instagram,
     game: {
       seedPlanted,
-      webPlaythroughs: null,
+      webPlaythroughs,
     },
-    mostViewedArticle: null,
+    analyticsPageVisits,
   };
 }
 
@@ -150,6 +253,6 @@ export const getDashboardData = unstable_cache(
   fetchDashboardData,
   ["dashboard-data"],
   {
-    revalidate: 86400, // 24 hours
+    revalidate: 86400,
   },
 );
