@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@apollo/client": "^4.2.7",
@@ -32,6 +34,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "prettier": "^3.9.6",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

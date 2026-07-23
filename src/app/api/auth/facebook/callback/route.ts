@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   if (!APP_ID || !APP_SECRET || !REDIRECT_URI || !PAGE_NAME) {
     return NextResponse.json(
       { error: "Missing Facebook OAuth environment variables." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -28,7 +28,7 @@ export async function GET(request: Request) {
           redirect_uri: REDIRECT_URI,
           code,
         },
-      }
+      },
     );
 
     const shortLivedToken = tokenResponse.data.access_token;
@@ -42,21 +42,27 @@ export async function GET(request: Request) {
           client_secret: APP_SECRET,
           fb_exchange_token: shortLivedToken,
         },
-      }
+      },
     );
 
     const longLivedToken = longLivedResponse.data.access_token;
 
-    const pages = await axios.get("https://graph.facebook.com/v25.0/me/accounts", {
-      params: {
-        access_token: longLivedToken,
+    const pages = await axios.get(
+      "https://graph.facebook.com/v25.0/me/accounts",
+      {
+        params: {
+          access_token: longLivedToken,
+        },
       },
-    });
+    );
 
     const allPages = pages?.data?.data || [];
 
     if (allPages.length === 0) {
-      return NextResponse.json({ error: "No Facebook pages were found." }, { status: 404 });
+      return NextResponse.json(
+        { error: "No Facebook pages were found." },
+        { status: 404 },
+      );
     }
 
     const savedPages = [] as Array<{
@@ -67,14 +73,18 @@ export async function GET(request: Request) {
     }>;
 
     for (const page of allPages) {
-      const igResponse = await axios.get(`https://graph.facebook.com/v25.0/${page.id}`, {
-        params: {
-          fields: "instagram_business_account",
-          access_token: page.access_token,
+      const igResponse = await axios.get(
+        `https://graph.facebook.com/v25.0/${page.id}`,
+        {
+          params: {
+            fields: "instagram_business_account",
+            access_token: page.access_token,
+          },
         },
-      });
+      );
 
-      const instagramId = igResponse?.data?.instagram_business_account?.id || null;
+      const instagramId =
+        igResponse?.data?.instagram_business_account?.id || null;
 
       savedPages.push({
         id: page.id,
@@ -95,7 +105,8 @@ export async function GET(request: Request) {
           data: {
             name: savedPage.name,
             pageAccessToken: savedPage.pageAccessToken,
-            instagramBusinessAccountId: savedPage.instagramBusinessAccountId || "",
+            instagramBusinessAccountId:
+              savedPage.instagramBusinessAccountId || "",
           },
         });
       } else {
@@ -104,7 +115,8 @@ export async function GET(request: Request) {
             pageId: savedPage.id,
             name: savedPage.name,
             pageAccessToken: savedPage.pageAccessToken,
-            instagramBusinessAccountId: savedPage.instagramBusinessAccountId || "",
+            instagramBusinessAccountId:
+              savedPage.instagramBusinessAccountId || "",
           },
         });
       }
@@ -133,8 +145,13 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Instagram connection failed." },
-      { status: 500 }
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Instagram connection failed.",
+      },
+      { status: 500 },
     );
   }
 }

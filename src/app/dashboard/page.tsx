@@ -5,9 +5,5 @@ import DashboardClient from "./DashboardClient";
 export default async function DashboardPage() {
   const dashboardData = await getDashboardData();
 
-  return (
-    <DashboardClient
-      dashboardData={dashboardData}
-    />
-  );
+  return <DashboardClient dashboardData={dashboardData} />;
 }

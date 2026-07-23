@@ -20,9 +20,7 @@ async function getInstagramData() {
     );
 
     if (!accountRes.ok) {
-      throw new Error(
-        `Instagram account API failed: ${accountRes.status}`,
-      );
+      throw new Error(`Instagram account API failed: ${accountRes.status}`);
     }
 
     const account = await accountRes.json();
@@ -33,19 +31,22 @@ async function getInstagramData() {
       `https://graph.facebook.com/v23.0/${INSTAGRAM_ACCOUNT_ID}/media?fields=id,caption,media_url,thumbnail_url,media_type,permalink,timestamp,like_count,comments_count,insights.metric(views,saved)&limit=100&access_token=${FB_PAGE_ACCESS_TOKEN}`;
 
     while (nextUrl) {
-      const res: {ok: boolean; status: number} = await fetch(nextUrl, {
+      const res: {
+        json(): unknown;
+        ok: boolean;
+        status: number;
+      } = await fetch(nextUrl, {
         next: {
-          revalidate: 86400,
+         revalidate: 86400,
         },
       });
 
       if (!res.ok) {
-        throw new Error(
-          `Instagram media API failed: ${res.status}`,
-        );
+        throw new Error(`Instagram media API failed: ${res.status}`);
       }
 
-      const data = await res.json();
+      const data: { data?: unknown[]; paging?: { next?: string } } =
+        await res.json();
 
       allPosts.push(...(data.data ?? []));
 
@@ -65,19 +66,17 @@ async function getInstagramData() {
       comments: item.comments_count ?? 0,
       views:
         item.insights?.data?.find(
-          (metric: {name: string}) => metric.name === "views",
+          (metric: { name: string }) => metric.name === "views",
         )?.values?.[0]?.value ?? 0,
       totalSaves:
         item.insights?.data?.find(
-          (metric: {name: string}) => metric.name === "saved",
+          (metric: { name: string }) => metric.name === "saved",
         )?.values?.[0]?.value ?? 0,
     }));
 
     const mostViewedPost =
       posts.length > 0
-        ? posts.reduce((max, post) =>
-            post.views > max.views ? post : max,
-          )
+        ? posts.reduce((max, post) => (post.views > max.views ? post : max))
         : null;
 
     return {
@@ -106,16 +105,13 @@ async function getSeedPlanted() {
     });
 
     if (!res.ok) {
-      throw new Error(
-        `Metrics API failed: ${res.status}`,
-      );
+      throw new Error(`Metrics API failed: ${res.status}`);
     }
 
     const data = await res.json();
 
     const planted = data.aggregates.find(
-      (item: {key: string}) =>
-        item.key === "planting.seedPlanted.count",
+      (item: { key: string }) => item.key === "planting.seedPlanted.count",
     );
 
     return {

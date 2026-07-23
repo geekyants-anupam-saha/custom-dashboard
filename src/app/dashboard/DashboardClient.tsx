@@ -16,11 +16,7 @@ import {
 import styles from "./page.module.scss";
 
 import { AppDispatch, RootState } from "@/lib/store";
-import {
-  clearAuth,
-  setLoading,
-  setUser,
-} from "@/lib/features/auth/authSlice";
+import { clearAuth, setLoading, setUser } from "@/lib/features/auth/authSlice";
 
 import DashboardHeader from "./components/DashboardHeader";
 import StatsCard from "./components/StatsCard";
@@ -58,9 +54,7 @@ export default function DashboardClient({
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
-  const { user, status } = useSelector(
-    (state: RootState) => state.auth,
-  );
+  const { user, status } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     const loadSession = async () => {
@@ -104,11 +98,7 @@ export default function DashboardClient({
   };
 
   if (status === "loading") {
-    return (
-      <main className={styles.loading}>
-        Loading Dashboard...
-      </main>
-    );
+    return <main className={styles.loading}>Loading Dashboard...</main>;
   }
 
   if (!user) {
@@ -150,9 +140,7 @@ export default function DashboardClient({
           {dashboardData.instagram.mostViewedPost && (
             <HighlightCard
               title="Most Viewed Post"
-              image={
-                dashboardData.instagram.mostViewedPost.image
-              }
+              image={dashboardData.instagram.mostViewedPost.image}
               avatar="/instagram.png"
               username="@worldofus"
               subText="2 days ago"
@@ -160,14 +148,12 @@ export default function DashboardClient({
               stats={[
                 {
                   icon: <Eye size={18} />,
-                  value:
-                    dashboardData.instagram.mostViewedPost.views,
+                  value: dashboardData.instagram.mostViewedPost.views,
                   label: "VIEWS",
                 },
                 {
                   icon: <Bookmark size={18} />,
-                  value:
-                    dashboardData.instagram.mostViewedPost.totalSaves,
+                  value: dashboardData.instagram.mostViewedPost.totalSaves,
                   label: "SAVES",
                 },
               ]}

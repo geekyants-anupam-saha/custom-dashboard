@@ -13,7 +13,7 @@ const MIN_SUPPORTED = {
 
 export function getBrowserInfo(): BrowserInfo {
   const ua = navigator.userAgent;
-    console.log("ua", ua);
+  console.log("ua", ua);
   // Platform
   let platform: BrowserInfo["platform"] = "Unknown";
 
@@ -28,7 +28,7 @@ export function getBrowserInfo(): BrowserInfo {
   if (/Android|iPhone|iPad/i.test(ua)) {
     platform = "Mobile";
   }
-  console.log("platform", platform)
+  console.log("platform", platform);
 
   // Browser
 
@@ -76,7 +76,7 @@ export function getBrowserInfo(): BrowserInfo {
 }
 
 export function isBrowserSupported(info: BrowserInfo) {
-    console.log("info", info);
+  console.log("info", info);
   switch (info.browser) {
     case "Chrome":
       return info.version >= MIN_SUPPORTED.Chrome;
@@ -96,7 +96,7 @@ export function isBrowserSupported(info: BrowserInfo) {
 }
 
 export async function isWebGPUSupported() {
-    console.log("navigator.gpu", navigator.gpu);
+  console.log("navigator.gpu", navigator.gpu);
   if (!navigator.gpu) {
     return false;
   }

@@ -9,7 +9,7 @@ export async function GET() {
   if (!APP_ID || !APP_SECRET || !REDIRECT_URI || !PAGE_NAME) {
     return NextResponse.json(
       { error: "Missing Facebook OAuth environment variables." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 

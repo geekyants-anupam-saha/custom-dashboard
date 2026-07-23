@@ -26,11 +26,15 @@ export async function readInstagramConfig(): Promise<InstagramConfig | null> {
   };
 }
 
-export async function writeInstagramConfig(config: InstagramConfig): Promise<void> {
+export async function writeInstagramConfig(
+  config: InstagramConfig,
+): Promise<void> {
   const pageName = process.env.PAGE_NAME;
   const account = pageName
     ? await prisma.facebookAccount.findFirst({ where: { name: pageName } })
-    : await prisma.facebookAccount.findFirst({ orderBy: { createdAt: "desc" } });
+    : await prisma.facebookAccount.findFirst({
+        orderBy: { createdAt: "desc" },
+      });
 
   if (!account) {
     return;
@@ -40,7 +44,8 @@ export async function writeInstagramConfig(config: InstagramConfig): Promise<voi
     where: { id: account.id },
     data: {
       pageAccessToken: config.page_access_token ?? account.pageAccessToken,
-      instagramBusinessAccountId: config.instagram_business_id ?? account.instagramBusinessAccountId,
+      instagramBusinessAccountId:
+        config.instagram_business_id ?? account.instagramBusinessAccountId,
     },
   });
 }

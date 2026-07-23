@@ -6,18 +6,13 @@ import { useRouter } from "next/navigation";
 import styles from "./page.module.scss";
 
 import { AppDispatch, RootState } from "@/lib/store";
-import {
-  setError,
-  setUser,
-} from "@/lib/features/auth/authSlice";
+import { setError, setUser } from "@/lib/features/auth/authSlice";
 
 export default function OtpPage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  const { error } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const { error } = useSelector((state: RootState) => state.auth);
 
   const [otp, setOtp] = useState("");
   const [email, setEmail] = useState("");
@@ -34,9 +29,7 @@ export default function OtpPage() {
     setEmail(savedEmail);
   }, [router]);
 
-  const handleVerifyOtp = async (
-    event: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleVerifyOtp = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (isVerifyingOtp) return;
@@ -59,9 +52,7 @@ export default function OtpPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.error ?? "Failed to verify OTP"
-        );
+        throw new Error(data.error ?? "Failed to verify OTP");
       }
 
       dispatch(setUser(data.user));
@@ -71,11 +62,7 @@ export default function OtpPage() {
       router.replace("/dashboard");
     } catch (err) {
       dispatch(
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Failed to verify OTP"
-        )
+        setError(err instanceof Error ? err.message : "Failed to verify OTP"),
       );
     } finally {
       setIsVerifyingOtp(false);
@@ -93,14 +80,8 @@ export default function OtpPage() {
           Enter the 6-digit OTP sent to your email.
         </p>
 
-        <form
-          onSubmit={handleVerifyOtp}
-          className={styles.formStack}
-        >
-          <label
-            htmlFor="otp"
-            className={styles.fieldLabel}
-          >
+        <form onSubmit={handleVerifyOtp} className={styles.formStack}>
+          <label htmlFor="otp" className={styles.fieldLabel}>
             OTP
           </label>
 
@@ -121,17 +102,11 @@ export default function OtpPage() {
             className={`${styles.button} ${styles.primary}`}
             disabled={isVerifyingOtp}
           >
-            {isVerifyingOtp
-              ? "Verifying..."
-              : "Verify"}
+            {isVerifyingOtp ? "Verifying..." : "Verify"}
           </button>
         </form>
 
-        {error && (
-          <p className={styles.errorText}>
-            {error}
-          </p>
-        )}
+        {error && <p className={styles.errorText}>{error}</p>}
       </section>
     </main>
   );

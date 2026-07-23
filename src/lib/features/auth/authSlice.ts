@@ -27,7 +27,11 @@ const authSlice = createSlice({
       state.error = null;
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
-      state.status = action.payload ? "loading" : state.user ? "authenticated" : "idle";
+      state.status = action.payload
+        ? "loading"
+        : state.user
+          ? "authenticated"
+          : "idle";
     },
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;

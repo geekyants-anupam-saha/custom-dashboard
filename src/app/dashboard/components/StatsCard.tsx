@@ -24,9 +24,7 @@ export default function StatsCard({
         {growth !== undefined && (
           <div
             className={`${styles.badge} ${
-              growthType === "positive"
-                ? styles.positive
-                : styles.negative
+              growthType === "positive" ? styles.positive : styles.negative
             }`}
           >
             {growthType === "positive" ? "↗" : "↘"} {growth}%

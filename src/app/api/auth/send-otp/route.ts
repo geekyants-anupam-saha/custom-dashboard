@@ -13,7 +13,7 @@ export async function POST(request: Request) {
         {
           error: "Please enter a valid email ending with @geekyants.com.",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -39,10 +39,7 @@ export async function POST(request: Request) {
     const result = await sendOtpEmail(email, otp);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: result.message }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -52,9 +49,6 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error(error);
 
-    return NextResponse.json(
-      { error: "Unable to send OTP" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Unable to send OTP" }, { status: 500 });
   }
 }

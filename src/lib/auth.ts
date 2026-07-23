@@ -8,7 +8,7 @@ export type AuthUser = {
 };
 
 const secret = new TextEncoder().encode(
-  process.env.JWT_SECRET ?? "local-dev-secret"
+  process.env.JWT_SECRET ?? "local-dev-secret",
 );
 
 export function isValidEmail(email: string) {
