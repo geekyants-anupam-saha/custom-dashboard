@@ -11,8 +11,12 @@ const secret = new TextEncoder().encode(
   process.env.JWT_SECRET ?? "local-dev-secret",
 );
 
+const ALLOWED_EMAIL_DOMAIN = process.env.ALLOWED_EMAIL_DOMAIN!;
+
 export function isValidEmail(email: string) {
-  return /^[A-Za-z0-9._%+-]+@geekyants\.com$/i.test(email);
+  const escapedDomain = ALLOWED_EMAIL_DOMAIN.replace(".", "\\.");
+
+  return new RegExp(`^[A-Za-z0-9._%+-]+@${escapedDomain}$`, "i").test(email);
 }
 
 export function generateOtp() {

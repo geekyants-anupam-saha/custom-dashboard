@@ -7,11 +7,12 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const email = typeof body?.email === "string" ? body.email.trim() : "";
+    const ALLOWED_EMAIL_DOMAIN = process.env.ALLOWED_EMAIL_DOMAIN!;
 
     if (!isValidEmail(email)) {
       return NextResponse.json(
         {
-          error: "Please enter a valid email ending with @geekyants.com.",
+          error: `Please enter a valid email ending with @${ALLOWED_EMAIL_DOMAIN}`,
         },
         { status: 400 },
       );
