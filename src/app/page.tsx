@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { useRive } from "@rive-app/react-canvas";
 import styles from "./page.module.scss";
 
 export default function HomePage() {
@@ -11,9 +13,13 @@ export default function HomePage() {
   const [error, setError] = useState("");
   const [isSendingOtp, setIsSendingOtp] = useState(false);
 
-  const handleSendOtp = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const { RiveComponent } = useRive({
+    src: "/wou-logo-2.riv",
+    stateMachines: "State Machine 1",
+    autoplay: true,
+  });
+
+  const handleSendOtp = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (isSendingOtp) return;
@@ -68,46 +74,74 @@ export default function HomePage() {
   };
 
   return (
-    <main className={styles.pageShell}>
-      <section className={styles.card}>
-        <p className={styles.eyebrow}>WoU Dashboard</p>
+    <main className={styles.page}>
+      <Image
+        src="/loginbg.png"
+        alt="Background"
+        fill
+        priority
+        className={styles.background}
+      />
 
-        <h1>Secure access</h1>
+      <div className={styles.overlay} />
 
-        <p className={styles.muted}>
-          Use your approved email address to receive an OTP and enter the
-          dashboard.
-        </p>
+      {/* Left Panel */}
+      <aside className={styles.sidebar}>
+        <div className={styles.logo}>
+          <RiveComponent />
+        </div>
 
-        <form onSubmit={handleSendOtp} className={styles.formStack}>
-          <label className={styles.fieldLabel} htmlFor="email">
-            Email
-          </label>
+        <div className={styles.sidebarContent}>
+          <h1>
+            Stories, Myths &
+            <br />A Caring World.
+          </h1>
 
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (error) setError("");
-            }}
-            placeholder="you@example.com"
-            className={styles.input}
-            disabled={isSendingOtp}
-            required
-          />
+          <p>
+            Your personal analytics dashboard for tracking the stories that
+            matter most.
+          </p>
+        </div>
+      </aside>
 
-          {error && <p className={styles.errorText}>{error}</p>}
+      {/* Login Card */}
+      <section className={styles.content}>
+        <div className={styles.card}>
+          <div className={styles.iconBox}>→</div>
 
-          <button
-            type="submit"
-            className={`${styles.button} ${styles.primary}`}
-            disabled={isSendingOtp}
-          >
-            {isSendingOtp ? "Sending OTP..." : "Send OTP"}
-          </button>
-        </form>
+          <h2>Sign in</h2>
+
+          <p className={styles.subtitle}>
+            Enter your email and we'll send you a one-time code.
+          </p>
+
+          <form onSubmit={handleSendOtp} className={styles.form}>
+            <label htmlFor="email">Your Email</label>
+
+            <input
+              id="email"
+              type="email"
+              value={email}
+              placeholder="Enter your email"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError("");
+              }}
+              disabled={isSendingOtp}
+            />
+
+            {error && <span className={styles.error}>{error}</span>}
+
+            <p className={styles.terms}>
+              By signing in you agree to our <a href="#">Terms of Service</a>{" "}
+              and <a href="#">Privacy Policy</a>.
+            </p>
+
+            <button type="submit" disabled={isSendingOtp}>
+              {isSendingOtp ? "Sending..." : "SUBMIT →"}
+            </button>
+          </form>
+        </div>
       </section>
     </main>
   );

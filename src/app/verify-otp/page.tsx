@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useRive } from "@rive-app/react-canvas";
 import styles from "./page.module.scss";
 
 export default function OtpPage() {
@@ -11,6 +13,12 @@ export default function OtpPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+
+  const { RiveComponent } = useRive({
+    src: "/wou-logo-2.riv",
+    stateMachines: "State Machine 1",
+    autoplay: true,
+  });
 
   useEffect(() => {
     const savedEmail = sessionStorage.getItem("email");
@@ -23,9 +31,7 @@ export default function OtpPage() {
     setEmail(savedEmail);
   }, [router]);
 
-  const handleVerifyOtp = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleVerifyOtp = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (isVerifyingOtp) return;
@@ -72,47 +78,84 @@ export default function OtpPage() {
   };
 
   return (
-    <main className={styles.pageShell}>
-      <section className={styles.card}>
-        <p className={styles.eyebrow}>WoU Dashboard</p>
+    <main className={styles.page}>
+      <Image
+        src="/loginbg.png"
+        alt=""
+        fill
+        priority
+        className={styles.background}
+      />
 
-        <h1>Secure access</h1>
+      <div className={styles.overlay} />
 
-        <p className={styles.muted}>
-          Enter the 6-digit OTP sent to your email.
-        </p>
+      <aside className={styles.sidebar}>
+        <div className={styles.logo}>
+          <RiveComponent />
+        </div>
 
-        <form onSubmit={handleVerifyOtp} className={styles.formStack}>
-          <label htmlFor="otp" className={styles.fieldLabel}>
-            OTP
-          </label>
+        <div className={styles.sidebarContent}>
+          <h1>
+            Stories, Myths &
+            <br />A Caring World.
+          </h1>
 
-          <input
-            id="otp"
-            type="text"
-            inputMode="numeric"
-            maxLength={6}
-            placeholder="Enter 6-digit code"
-            value={otp}
-            onChange={(e) => {
-              setOtp(e.target.value.replace(/\D/g, ""));
-              if (error) setError("");
-            }}
-            className={styles.input}
-            disabled={isVerifyingOtp}
-            required
-          />
+          <p>
+            Your personal analytics dashboard for tracking the stories that
+            matter most.
+          </p>
+        </div>
+      </aside>
 
-          {error && <p className={styles.errorText}>{error}</p>}
-
+      <section className={styles.content}>
+        <div className={styles.card}>
           <button
-            type="submit"
-            className={`${styles.button} ${styles.primary}`}
-            disabled={isVerifyingOtp}
+            className={styles.changeEmail}
+            type="button"
+            onClick={() => router.push("/")}
           >
-            {isVerifyingOtp ? "Verifying..." : "Verify"}
+            ← Change Email
           </button>
-        </form>
+
+          <div className={styles.iconBox}>🕒</div>
+
+          <h2>Check your email</h2>
+
+          <p className={styles.subtitle}>
+            We've sent a 6-digit code to <strong>{email}</strong>
+          </p>
+
+          <form onSubmit={handleVerifyOtp} className={styles.form}>
+            <input
+              type="text"
+              value={otp}
+              maxLength={6}
+              inputMode="numeric"
+              placeholder="X X X X X X"
+              onChange={(e) => {
+                setOtp(e.target.value.replace(/\D/g, ""));
+                if (error) setError("");
+              }}
+            />
+
+            <div className={styles.resend}>
+              Resend code in <strong>21s</strong>
+            </div>
+
+            {error && <span className={styles.error}>{error}</span>}
+
+            <button className={styles.verifyBtn} disabled={isVerifyingOtp}>
+              {isVerifyingOtp ? "VERIFYING..." : "VERIFY & SIGN IN"}
+            </button>
+          </form>
+
+          <p className={styles.footerText}>
+            Didn't get it? Check your spam folder or{" "}
+            <button type="button" onClick={() => router.push("/")}>
+              try another email.
+            </button>
+          </p>
+        </div>
       </section>
     </main>
   );
