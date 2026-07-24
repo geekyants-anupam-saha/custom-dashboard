@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRive } from "@rive-app/react-canvas";
 import styles from "./page.module.scss";
+import { Clock } from "lucide-react";
 
 export default function OtpPage() {
   const router = useRouter();
@@ -78,7 +79,7 @@ export default function OtpPage() {
   };
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <Image
         src="/loginbg.png"
         alt=""
@@ -107,7 +108,7 @@ export default function OtpPage() {
         </div>
       </aside>
 
-      <section className={styles.content}>
+      <div className={styles.content}>
         <div className={styles.card}>
           <button
             className={styles.changeEmail}
@@ -117,7 +118,7 @@ export default function OtpPage() {
             ← Change Email
           </button>
 
-          <div className={styles.iconBox}>🕒</div>
+          <div className={styles.iconBox}><Clock size={50} /></div>
 
           <h2>Check your email</h2>
 
@@ -156,7 +157,7 @@ export default function OtpPage() {
             </button>
           </p>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
   );
 }

@@ -56,11 +56,11 @@ export default function DashboardPage({
   };
 
   return (
-    <>
+    <div>
       <DashboardHeader onLogout={handleLogout} />
 
-      <main className={styles.container}>
-        <section className={styles.statsGrid}>
+      <div className={styles.container}>
+        <div className={styles.statsGrid}>
           <StatsCard
             title="Seeds Planted"
             value={dashboardData.game.seedPlanted.count}
@@ -78,9 +78,9 @@ export default function DashboardPage({
             value={dashboardData.instagram.followersCount}
             icon={<UsersRound />}
           />
-        </section>
+        </div>
 
-        <section className={styles.highlightGrid}>
+        <div className={styles.highlightGrid}>
           {dashboardData.instagram.mostViewedPost && (
             <HighlightCard
               title="Most Viewed Post"
@@ -137,8 +137,8 @@ export default function DashboardPage({
               ]}
             />
           )}
-        </section>
-      </main>
-    </>
+        </div>
+      </div>
+    </div>
   );
 }
