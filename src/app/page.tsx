@@ -74,7 +74,7 @@ export default function HomePage() {
   };
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <Image
         src="/loginbg.png"
         alt="Background"
@@ -86,7 +86,7 @@ export default function HomePage() {
       <div className={styles.overlay} />
 
       {/* Left Panel */}
-      <aside className={styles.sidebar}>
+      <div className={styles.sidebar}>
         <div className={styles.logo}>
           <RiveComponent />
         </div>
@@ -102,10 +102,10 @@ export default function HomePage() {
             matter most.
           </p>
         </div>
-      </aside>
+      </div>
 
       {/* Login Card */}
-      <section className={styles.content}>
+      <div className={styles.content}>
         <div className={styles.card}>
           <div className={styles.iconBox}>→</div>
 
@@ -142,7 +142,7 @@ export default function HomePage() {
             </button>
           </form>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
   );
 }
