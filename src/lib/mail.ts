@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mailchimpTransactional from "@mailchimp/mailchimp_transactional";
 import { otpTemplate } from "@/lib/mailTemplates/otpTemplate";
 
@@ -7,7 +8,7 @@ const mailchimp = mailchimpTransactional(
 
 export async function sendOtpEmail(email: string, otp: string) {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     await mailchimp.messages.send({
       message: {
         from_email: process.env.FROM_EMAIL!,
@@ -18,7 +19,7 @@ export async function sendOtpEmail(email: string, otp: string) {
             type: "to",
           },
         ],
-        subject: "Your OTP Code",
+        subject: "Your World of Us Dashboard Login Code",
         html: otpTemplate(otp),
       },
     } as any);

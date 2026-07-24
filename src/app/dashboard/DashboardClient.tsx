@@ -37,6 +37,7 @@ interface DashboardPageProps {
       webPlaythroughs: number | null;
     };
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mostViewedArticle: any;
 }
 

@@ -5,7 +5,7 @@ export function otpTemplate(otp: string) {
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>OTP Verification</title>
+      <title>World of Us Dashboard Login</title>
     </head>
 
     <body
@@ -36,6 +36,7 @@ export function otpTemplate(otp: string) {
                 border: 1px solid #e5e7eb;
               "
             >
+              <!-- Header -->
               <tr>
                 <td
                   style="
@@ -49,13 +50,15 @@ export function otpTemplate(otp: string) {
                       margin: 0;
                       color: #ffffff;
                       font-size: 24px;
+                      font-weight: 600;
                     "
                   >
-                    Tales of Us
+                    World of Us
                   </h2>
                 </td>
               </tr>
 
+              <!-- Content -->
               <tr>
                 <td style="padding: 32px;">
                   <h3
@@ -63,22 +66,37 @@ export function otpTemplate(otp: string) {
                       margin: 0 0 16px;
                       color: #111827;
                       font-size: 22px;
+                      font-weight: 600;
                     "
                   >
-                    Verify your email
+                    Verify your dashboard login
                   </h3>
+
+                  <p
+                    style="
+                      margin: 0 0 16px;
+                      color: #4b5563;
+                      line-height: 1.6;
+                      font-size: 15px;
+                    "
+                  >
+                    We received a request to sign in to the
+                    <strong>World of Us Dashboard</strong> using this email
+                    address.
+                  </p>
 
                   <p
                     style="
                       margin: 0 0 24px;
                       color: #4b5563;
                       line-height: 1.6;
+                      font-size: 15px;
                     "
                   >
-                    Use the verification code below to continue. This OTP is
-                    valid for <strong>10 minutes</strong>.
+                    Enter the verification code below to securely continue:
                   </p>
 
+                  <!-- OTP -->
                   <div
                     style="
                       background: #f3f4f6;
@@ -92,7 +110,7 @@ export function otpTemplate(otp: string) {
                     <span
                       style="
                         font-size: 36px;
-                        font-weight: bold;
+                        font-weight: 700;
                         letter-spacing: 8px;
                         color: #111827;
                       "
@@ -103,17 +121,33 @@ export function otpTemplate(otp: string) {
 
                   <p
                     style="
+                      margin: 0 0 16px;
                       color: #6b7280;
                       line-height: 1.6;
-                      margin: 0;
+                      font-size: 14px;
+                      text-align: center;
                     "
                   >
-                    If you didn't request this code, you can safely ignore this
-                    email.
+                    This code will expire in
+                    <strong style="color: #374151;">10 minutes</strong>
+                    and can only be used once.
+                  </p>
+
+                  <p
+                    style="
+                      margin: 24px 0 0;
+                      color: #6b7280;
+                      line-height: 1.6;
+                      font-size: 14px;
+                    "
+                  >
+                    If you didn't request this code, you can safely ignore
+                    this email. Your account remains secure.
                   </p>
                 </td>
               </tr>
 
+              <!-- Footer -->
               <tr>
                 <td
                   style="
@@ -122,9 +156,10 @@ export function otpTemplate(otp: string) {
                     background: #f9fafb;
                     color: #9ca3af;
                     font-size: 13px;
+                    line-height: 1.5;
                   "
                 >
-                  © ${new Date().getFullYear()} Tales of Us. All rights reserved.
+                  © ${new Date().getFullYear()} World of Us. All rights reserved.
                 </td>
               </tr>
             </table>
