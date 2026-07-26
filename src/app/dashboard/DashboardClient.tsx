@@ -56,9 +56,15 @@ export default function DashboardPage({
     router.refresh();
   };
 
+  const averageSessionDuration = mostViewedArticle?.averageSessionDuration ?? 0;
+
+  const handleDateChange = (startDate: string, endDate: string) => {
+    console.log("Selected date range:", startDate, "to", endDate);
+  }
+
   return (
     <div>
-      <DashboardHeader onLogout={handleLogout} />
+      <DashboardHeader onLogout={handleLogout} handleDateChange={handleDateChange} />
 
       <div className={styles.container}>
         <div className={styles.statsGrid}>
@@ -130,9 +136,10 @@ export default function DashboardPage({
                 },
                 {
                   icon: <Clock3 size={18} />,
-                  value: `${Math.floor(
-                    mostViewedArticle.averageSessionDuration / 60,
-                  )} MINS`,
+                  value:
+                    averageSessionDuration >= 60
+                      ? `${Math.floor(averageSessionDuration / 60)} MINS`
+                      : `${Math.round(averageSessionDuration)} SEC`,
                   label: "AVG TIME",
                 },
               ]}

@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { unstable_cache } from "next/cache";
 import { GoogleAuth } from "google-auth-library";
+import { getArticleData } from "@/services";
+import { fetchData } from "@/services/fetchData";
 
 const FB_PAGE_ACCESS_TOKEN = process.env.FB_PAGE_ACCESS_TOKEN!;
 const INSTAGRAM_ACCOUNT_ID = process.env.INSTAGRAM_ACCOUNT_ID!;
+
+const revalidateTime = 60 * 60 * 24; // 24 hours in seconds
 
 const METRICS_API =
   "https://admin.game.worldofus.info/api/metrics/query?fromUtc=2026-02-02T22%3A00%3A00.0000000Z&toUtc=2026-06-22T20%3A59%3A59.9999999Z&groupBy=metricKey&operation=sum&limit=500&metricGroups=planting";
@@ -16,7 +20,7 @@ async function getInstagramData() {
       `https://graph.facebook.com/v23.0/${INSTAGRAM_ACCOUNT_ID}?fields=followers_count&access_token=${FB_PAGE_ACCESS_TOKEN}`,
       {
         next: {
-          revalidate: 86400,
+          revalidate: revalidateTime,
         },
       },
     );
@@ -35,7 +39,7 @@ async function getInstagramData() {
     while (nextUrl) {
       const res: any = await fetch(nextUrl, {
         next: {
-          revalidate: 86400,
+          revalidate: revalidateTime,
         },
       });
 
@@ -95,7 +99,7 @@ async function getSeedPlanted() {
         "X-Metrics-Api-Token": METRICS_TOKEN,
       },
       next: {
-        revalidate: 86400,
+        revalidate: revalidateTime,
       },
     });
 
@@ -149,11 +153,11 @@ async function getAnalyticsPageVisits() {
         body: JSON.stringify({
           dateRanges: [
             {
-              startDate: "365daysAgo",
-              endDate: "today",
+              startDate: "2023-06-30",
+              endDate: "2025-04-16",
             },
           ],
-          dimensions: [{ name: "pagePath" }, { name: "pageTitle" }],
+          dimensions: [{ name: "pagePath" }],
           metrics: [
             { name: "screenPageViews" },
             { name: "userEngagementDuration" },
@@ -170,7 +174,7 @@ async function getAnalyticsPageVisits() {
           limit: 100,
         }),
         next: {
-          revalidate: 86400,
+          revalidate: revalidateTime,
         },
       },
     );
@@ -214,7 +218,7 @@ async function getWebPlaythroughs() {
         "X-Metrics-Api-Token": METRICS_TOKEN,
       },
       next: {
-        revalidate: 86400,
+        revalidate: revalidateTime,
       },
     });
 
@@ -254,6 +258,20 @@ export const getDashboardData = unstable_cache(
   fetchDashboardData,
   ["dashboard-data"],
   {
-    revalidate: 86400,
+    revalidate: revalidateTime,
+  },
+);
+
+export const getArticleDataCached = unstable_cache(
+  async () => {
+    return fetchData(getArticleData, {
+      locale: "en",
+      page: 1,
+      pageSize: 1000,
+    });
+  },
+  ["article-data"],
+  {
+    revalidate: revalidateTime,
   },
 );

@@ -1,49 +1,43 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { getArticleDataCached, getDashboardData } from "@/lib/dashboard/getDashboardData";
 import DashboardPage from "./DashboardClient";
-import { getArticleData } from "@/services";
-import { fetchData } from "@/services/fetchData";
 
 export default async function HomePage() {
-  const data: any | null = await fetchData(getArticleData, {
-    locale: "en",
-  });
+  const articlesData: any = await getArticleDataCached();
+  const dashboardData = await getDashboardData();
 
-  const dashboardRes = await fetch("http://localhost:3000/api/dashboard", {
-    cache: "no-store",
-  });
+  const articles = articlesData?.articles?.data ?? [];
 
-  const dashboard = await dashboardRes.json();
+  const analyticsPages = dashboardData?.analyticsPageVisits ?? [];
 
-  const articles = data?.articles?.data ?? [];
+  let mostViewedArticle = null;
 
-  const analyticsPages = dashboard?.analyticsPageVisits ?? [];
+  for (const page of analyticsPages) {
+    const pageSlug = page.pagePath?.split("/").filter(Boolean).pop();
 
-  const mostViewedArticles = articles
-    .map((article: any) => {
+    const articleData = articles.find((article: any) => {
       const slug = article.attributes.Slug;
 
-      const analyticsData = analyticsPages.find((page: any) => {
-        const pageSlug = page.pagePath.split("/").filter(Boolean).pop();
+      return pageSlug?.toLowerCase() === slug?.toLowerCase();
+    });
 
-        return pageSlug?.toLowerCase() === slug?.toLowerCase();
-      });
-
-      if (!analyticsData) return null;
-
-      return {
-        ...article,
-        pageViews: analyticsData.pageViews,
-        averageSessionDuration: analyticsData.averageEngagementPerActiveUser,
-        pagePath: analyticsData.pagePath,
-        pageTitle: analyticsData.pageTitle,
+    if (articleData) {
+      mostViewedArticle = {
+        ...articleData,
+        pageViews: page.pageViews,
+        averageSessionDuration: page.averageEngagementPerActiveUser,
+        pagePath: page.pagePath,
+        pageTitle: page.pageTitle,
       };
-    })
-    .filter(Boolean)
-    .sort((a: any, b: any) => b.pageViews - a.pageViews);
+
+      break;
+    }
+  }
 
   return (
     <DashboardPage
-      dashboardData={dashboard}
-      mostViewedArticle={mostViewedArticles[0] ?? null}
+      dashboardData={dashboardData}
+      mostViewedArticle={mostViewedArticle ?? null}
     />
   );
 }
