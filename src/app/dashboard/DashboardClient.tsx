@@ -55,6 +55,7 @@ export default function DashboardPage({
     router.replace("/");
     router.refresh();
   };
+  const averageSessionDuration = mostViewedArticle?.averageSessionDuration ?? 0;
 
   return (
     <div>
@@ -130,9 +131,9 @@ export default function DashboardPage({
                 },
                 {
                   icon: <Clock3 size={18} />,
-                  value: `${Math.floor(
-                    mostViewedArticle.averageSessionDuration / 60,
-                  )} MINS`,
+                  value: averageSessionDuration >= 60
+                      ? `${Math.floor(averageSessionDuration / 60)} MINS`
+                      : `${Math.round(averageSessionDuration)} SEC`,
                   label: "AVG TIME",
                 },
               ]}
