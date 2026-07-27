@@ -14,9 +14,18 @@ export const getArticleData = gql`
       sort: $sort
       filters: $filters
     ) {
+      meta {
+        pagination {
+          total
+          page
+          pageCount
+        }
+      }
       data {
         id
         attributes {
+          readTime
+          ExcludeFromSlider
           Title
           Slug
           ShortDes
@@ -24,6 +33,33 @@ export const getArticleData = gql`
             data {
               attributes {
                 url
+                alternativeText
+                caption
+              }
+            }
+          }
+          PublishDate
+          Video
+          VideoLink
+          LikeCount
+          article_categories {
+            data {
+              attributes {
+                Name
+              }
+            }
+          }
+          authors {
+            data {
+              attributes {
+                Name
+                ProfilePic {
+                  data {
+                    attributes {
+                      url
+                    }
+                  }
+                }
               }
             }
           }
