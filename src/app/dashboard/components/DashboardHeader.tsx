@@ -1,22 +1,52 @@
 "use client";
 
+import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { CalendarDays, ChevronDown, LogOut } from "lucide-react";
-import { useRive } from "@rive-app/react-canvas";
+
+import DateRangeModal from "../components/DateRangeModal/DateRangeModal";
+import { getRangeByKey } from "../components/DateRangeModal/dateRanges";
+
 import styles from "./DashboardHeader.module.scss";
+import Logo from "@/components/icons/Logo";
 
 interface DashboardHeaderProps {
   onLogout: () => void;
+  onDateSelect?: () => void;
 }
 
-export default function DashboardHeader({ onLogout }: DashboardHeaderProps) {
-  const { RiveComponent } = useRive({
-    src: "/wou-logo-2.riv",
-    stateMachines: "State Machine 1",
-    autoplay: true,
-  });
+export default function DashboardHeader({
+  onLogout,
+  onDateSelect,
+}: DashboardHeaderProps) {
+  const searchParams = useSearchParams();
+
+  const [open, setOpen] = useState(false);
+
+  const selectedRange = useMemo(() => {
+    const range = searchParams.get("range");
+
+    return getRangeByKey(range ?? "lastYear");
+  }, [searchParams]);
+
+  const customStart = searchParams.get("startDate");
+  const customEnd = searchParams.get("endDate");
+
+  const displayDate =
+    customStart && customEnd
+      ? `${new Date(customStart).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })} - ${new Date(customEnd).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })}`
+      : selectedRange.displayRange;
 
   return (
-    <header className={styles.header}>
+    <div className={styles.header}>
       <div className={styles.left}>
         <div
           style={{
@@ -25,28 +55,43 @@ export default function DashboardHeader({ onLogout }: DashboardHeaderProps) {
             cursor: "pointer",
           }}
         >
-          <RiveComponent />
+          <Logo />
         </div>
       </div>
 
       <div className={styles.right}>
-        <button className={styles.dateButton}>
-          <CalendarDays size={18} />
+        <div className={styles.dateWrapper}>
+          <button
+            className={styles.dateButton}
+            onClick={() => setOpen((prev) => !prev)}
+          >
+            <CalendarDays color="white" size={18} />
 
-          <span>Last 12 Months</span>
+            <span>{selectedRange.label}</span>
 
-          <span className={styles.date}>Jun 4 - Jul 1, 2026</span>
+            <span className={styles.date}>{displayDate}</span>
 
-          <ChevronDown size={16} />
-        </button>
+            <ChevronDown
+              color="white"
+              size={16}
+              className={open ? styles.rotate : ""}
+            />
+          </button>
+
+          <DateRangeModal
+            open={open}
+            onClose={() => setOpen(false)}
+            onSelect={onDateSelect}
+          />
+        </div>
 
         <div className={styles.divider} />
 
         <button className={styles.logout} onClick={onLogout}>
           Logout
-          <LogOut size={18} />
+          <LogOut color="white" size={18} />
         </button>
       </div>
-    </header>
+    </div>
   );
 }

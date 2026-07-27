@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useRive } from "@rive-app/react-canvas";
 import styles from "./page.module.scss";
+import Logo from "@/components/icons/Logo";
 
 export default function HomePage() {
   const router = useRouter();
@@ -13,11 +13,6 @@ export default function HomePage() {
   const [error, setError] = useState("");
   const [isSendingOtp, setIsSendingOtp] = useState(false);
 
-  const { RiveComponent } = useRive({
-    src: "/wou-logo-2.riv",
-    stateMachines: "State Machine 1",
-    autoplay: true,
-  });
 
   const handleSendOtp = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -88,7 +83,7 @@ export default function HomePage() {
       {/* Left Panel */}
       <div className={styles.sidebar}>
         <div className={styles.logo}>
-          <RiveComponent />
+          <Logo />
         </div>
 
         <div className={styles.sidebarContent}>
