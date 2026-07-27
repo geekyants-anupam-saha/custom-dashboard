@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useRive } from "@rive-app/react-canvas";
 import styles from "./page.module.scss";
 import { Clock } from "lucide-react";
+import Logo from "@/components/icons/Logo";
 
 export default function OtpPage() {
   const router = useRouter();
@@ -14,12 +14,6 @@ export default function OtpPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
-
-  const { RiveComponent } = useRive({
-    src: "/wou-logo-2.riv",
-    stateMachines: "State Machine 1",
-    autoplay: true,
-  });
 
   useEffect(() => {
     const savedEmail = sessionStorage.getItem("email");
@@ -92,7 +86,7 @@ export default function OtpPage() {
 
       <aside className={styles.sidebar}>
         <div className={styles.logo}>
-          <RiveComponent />
+          <Logo />
         </div>
 
         <div className={styles.sidebarContent}>
@@ -118,7 +112,9 @@ export default function OtpPage() {
             ← Change Email
           </button>
 
-          <div className={styles.iconBox}><Clock size={50} /></div>
+          <div className={styles.iconBox}>
+            <Clock size={50} />
+          </div>
 
           <h2>Check your email</h2>
 
