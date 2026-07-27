@@ -22,7 +22,7 @@
   background:
     radial-gradient(
       circle at 80% 20%,
-      rgba(255, 255, 255, 0.05),
+      var(--white-5),
       transparent 45%
     ),
     radial-gradient(
@@ -32,15 +32,15 @@
     ),
     rgba(38, 10, 33, 0.92);
 
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--white-18);
 
   backdrop-filter: blur(34px) saturate(180%);
   -webkit-backdrop-filter: blur(34px) saturate(180%);
 
   box-shadow:
     0 30px 80px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 -30px 60px rgba(255, 255, 255, 0.03);
+    inset 0 1px 0 var(--border),
+    inset 0 -30px 60px var(--white-3);
 
   overflow: hidden;
 
@@ -63,7 +63,7 @@
   margin: 0;
   padding: 0 28px 18px;
 
-  color: rgba(255, 255, 255, 0.58);
+  color: var(--white-58);
 
   font-size: 15px;
   font-weight: 500;
@@ -76,7 +76,7 @@
 
   margin: 0 28px 8px;
 
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--border);
 }
 
 .list {
@@ -105,16 +105,16 @@
 }
 
 .item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--white-5);
   padding-left: 34px;
 }
 
 .active {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--white-6);
 }
 
 .label {
-  color: #fff;
+  color: var(--primary);
 
   font-size: 18px;
   font-weight: 500;
@@ -125,7 +125,7 @@
 .date {
   margin-left: 6px;
 
-  color: rgba(255, 255, 255, 0.48);
+  color: var(--white-48);
 
   font-size: 16px;
   font-weight: 400;
@@ -181,11 +181,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.58);
+  color: var(--white-58);
   transition: color 0.2s;
 
   &:hover {
-    color: #fff;
+    color: var(--primary);
   }
 }
 
@@ -209,20 +209,20 @@
 .dateInput {
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  border-bottom: 1px solid var(--white-25);
   padding: 8px 0;
-  color: #fff;
+  color: var(--primary);
   font-size: 18px;
   outline: none;
   font-family: inherit;
   transition: border-color 0.2s;
   
   &::placeholder {
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-placeholder);
   }
 
   &:focus {
-    border-bottom-color: #fff;
+    border-bottom-color: var(--primary);
   }
   
   &::-webkit-calendar-picker-indicator {
@@ -235,10 +235,10 @@
 .applyBtn {
   margin: 12px auto 0;
   padding: 12px 36px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--white-10);
+  border: 1px solid var(--white-20);
   border-radius: 30px;
-  color: #fff;
+  color: var(--primary);
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -246,7 +246,7 @@
   transition: background 0.2s, border-color 0.2s;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.4);
+    background: var(--white-20);
+    border-color: var(--text-placeholder);
   }
 }

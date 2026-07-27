@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { cookies } from "next/headers";
 import { GoogleAuth } from "google-auth-library";
 import { getArticleData } from "@/services";
 import { fetchData } from "@/services/fetchData";
@@ -356,6 +357,13 @@ async function fetchDashboardData(range: DashboardDateRange) {
 }
 
 export async function getDashboardData(startDate?: string, endDate?: string) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth-token")?.value;
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
   const actualStartDate =
     startDate ??
     new Date(
