@@ -38,8 +38,8 @@ function isWithinDateRange(
   );
 }
 
-const getAllInstagramPostsCached = unstable_cache(
-  async () => {
+const getInstagramDataCached = unstable_cache(
+  async (range: DashboardDateRange) => {
     try {
       const accountRes = await fetch(
         `https://graph.facebook.com/v23.0/${INSTAGRAM_ACCOUNT_ID}?fields=followers_count&access_token=${FB_PAGE_ACCESS_TOKEN}`,
@@ -55,6 +55,8 @@ const getAllInstagramPostsCached = unstable_cache(
       let nextUrl: string | null =
         `https://graph.facebook.com/v23.0/${INSTAGRAM_ACCOUNT_ID}/media?fields=id,caption,media_url,thumbnail_url,media_type,permalink,timestamp,like_count,comments_count,insights.metric(views,saved)&limit=100&access_token=${FB_PAGE_ACCESS_TOKEN}`;
 
+      const rangeStartTime = new Date(range.startDate).getTime();
+
       while (nextUrl) {
         try {
           const res: any = await fetch(nextUrl);
@@ -63,7 +65,16 @@ const getAllInstagramPostsCached = unstable_cache(
             break;
           }
           const data = await res.json();
-          allPosts.push(...(data.data ?? []));
+          const fetchedPosts = data.data ?? [];
+          allPosts.push(...fetchedPosts);
+          
+          if (fetchedPosts.length > 0) {
+            const oldestPostInBatch = fetchedPosts[fetchedPosts.length - 1];
+            if (new Date(oldestPostInBatch.timestamp).getTime() < rangeStartTime) {
+              break;
+            }
+          }
+
           nextUrl = data.paging?.next ?? null;
         } catch (pageErr) {
           console.error("Instagram pagination error:", pageErr);
@@ -71,61 +82,55 @@ const getAllInstagramPostsCached = unstable_cache(
         }
       }
 
-      return { account, allPosts };
+      const filteredPosts = allPosts.filter((post) =>
+        isWithinDateRange(post.timestamp, range),
+      );
+
+      const posts = filteredPosts.map((item: any) => ({
+        id: item.id,
+        caption: item.caption,
+        mediaUrl: item.media_url,
+        thumbnailUrl: item.thumbnail_url,
+        image: item.media_type === "VIDEO" ? item.thumbnail_url : item.media_url,
+        mediaType: item.media_type,
+        permalink: item.permalink,
+        timestamp: item.timestamp,
+        likes: item.like_count ?? 0,
+        comments: item.comments_count ?? 0,
+        views:
+          item.insights?.data?.find((metric: any) => metric.name === "views")
+            ?.values?.[0]?.value ?? 0,
+        totalSaves:
+          item.insights?.data?.find((metric: any) => metric.name === "saved")
+            ?.values?.[0]?.value ?? 0,
+      }));
+
+      const mostViewedPost =
+        posts.length > 0
+          ? posts.reduce((max, post) => (post.views > max.views ? post : max))
+          : null;
+
+      return {
+        followersCount: account.followers_count ?? 0,
+        mostViewedPost,
+      };
     } catch (err) {
-      console.error("Instagram fetch error:", err);
-      return { account: { followers_count: 0 }, allPosts: [] };
+      throw new Error(`Failed to fetch Instagram data: ${err instanceof Error ? err.message : String(err)}`);
     }
   },
-  ["instagram-all-posts"],
-  { revalidate: revalidateTime },
+  ["instagram-data-optimized"],
+  { revalidate: revalidateTime }
 );
 
 async function getInstagramData(range: DashboardDateRange) {
-  try {
-    const { account, allPosts } = await getAllInstagramPostsCached();
-
-    const filteredPosts = allPosts.filter((post) =>
-      isWithinDateRange(post.timestamp, range),
-    );
-
-    const posts = filteredPosts.map((item: any) => ({
-      id: item.id,
-      caption: item.caption,
-      mediaUrl: item.media_url,
-      thumbnailUrl: item.thumbnail_url,
-      image: item.media_type === "VIDEO" ? item.thumbnail_url : item.media_url,
-      mediaType: item.media_type,
-      permalink: item.permalink,
-      timestamp: item.timestamp,
-      likes: item.like_count ?? 0,
-      comments: item.comments_count ?? 0,
-      views:
-        item.insights?.data?.find((metric: any) => metric.name === "views")
-          ?.values?.[0]?.value ?? 0,
-      totalSaves:
-        item.insights?.data?.find((metric: any) => metric.name === "saved")
-          ?.values?.[0]?.value ?? 0,
-    }));
-
-    const mostViewedPost =
-      posts.length > 0
-        ? posts.reduce((max, post) => (post.views > max.views ? post : max))
-        : null;
-
-    return {
-      followersCount: account.followers_count ?? 0,
-      mostViewedPost,
-    };
-  } catch (err) {
-    console.error("Instagram error:", err);
-
-    return {
-      followersCount: 0,
-      mostViewedPost: null,
-    };
-  }
+  return unstable_cache(
+    () => getInstagramDataCached(range),
+    ["instagram-data-optimized", range.startDate, range.endDate],
+    { revalidate: revalidateTime }
+  )();
 }
+
+
 
 async function getSeedPlanted() {
   try {
@@ -154,38 +159,7 @@ async function getSeedPlanted() {
       sessions: planted?.distinctSessions ?? 0,
     };
   } catch (err) {
-    console.error("Metrics error:", err);
-
-    return {
-      count: 0,
-      users: 0,
-      sessions: 0,
-    };
-  }
-}
-
-async function getWebPlaythroughs() {
-  try {
-    const res = await fetch(getMetricsApiUrl(), {
-      headers: {
-        "X-Metrics-Api-Token": METRICS_TOKEN,
-      },
-      next: {
-        revalidate: 86400,
-      },
-    });
-
-    if (!res.ok) {
-      throw new Error(`Metrics API failed: ${res.status}`);
-    }
-
-    const data = await res.json();
-
-    return data?.totalCount ?? 0;
-  } catch (err) {
-    console.error("Web playthroughs error:", err);
-
-    return 0;
+    throw new Error(`Failed to fetch planting metrics: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 
@@ -272,8 +246,7 @@ async function getAnalyticsPageVisits(range: DashboardDateRange) {
       }) ?? []
     );
   } catch (err) {
-    console.error("Analytics error:", err);
-    return [];
+    throw new Error(`Failed to fetch Google Analytics data: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 const getAllArticlesCached = unstable_cache(
@@ -285,29 +258,27 @@ const getAllArticlesCached = unstable_cache(
         pageSize: 1000,
       });
     } catch (err) {
-      console.error("Articles fetch error:", err);
-      return { articles: { data: [] } };
+      throw new Error(`Failed to fetch articles data: ${err instanceof Error ? err.message : String(err)}`);
     }
   },
-  ["all-articles"],
-  { revalidate: revalidateTime },
+  ["all-articles-v2"],
+  { revalidate: revalidateTime }
 );
 
 async function fetchDashboardData(range: DashboardDateRange) {
   try {
-    const [
-      instagram,
-      seedPlanted,
-      analyticsPageVisits,
-      webPlaythroughs,
-      articlesData,
-    ] = await Promise.all([
-      getInstagramData(range),
-      getSeedPlanted(),
-      getAnalyticsPageVisits(range),
-      getWebPlaythroughs(),
-      getAllArticlesCached(),
-    ]);
+    const [instagram, seedPlanted, analyticsPageVisits, articlesData] =
+      await Promise.all([
+        getInstagramData(range),
+        getSeedPlanted(),
+        getAnalyticsPageVisits(range),
+        getAllArticlesCached(),
+      ]);
+
+    const gamePage = analyticsPageVisits.find(
+      (page: any) => page.pagePath === "/game",
+    );
+    const webPlaythroughs = gamePage ? gamePage.pageViews : 0;
 
     const articles = (articlesData as any)?.articles?.data ?? [];
     let mostViewedArticle = null;
@@ -339,20 +310,10 @@ async function fetchDashboardData(range: DashboardDateRange) {
         seedPlanted,
         webPlaythroughs,
       },
-      analyticsPageVisits,
       mostViewedArticle,
     };
   } catch (err) {
-    console.error("Dashboard fetch error:", err);
-    return {
-      instagram: { followersCount: 0, mostViewedPost: null },
-      game: {
-        seedPlanted: { count: 0, users: 0, sessions: 0 },
-        webPlaythroughs: 0,
-      },
-      analyticsPageVisits: [],
-      mostViewedArticle: null,
-    };
+    throw new Error(`Dashboard data fetch failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 
@@ -371,15 +332,14 @@ export async function getDashboardData(startDate?: string, endDate?: string) {
     ).toISOString();
   const actualEndDate = endDate ?? new Date().toISOString();
 
-  return unstable_cache(
-    () =>
-      fetchDashboardData({
-        startDate: actualStartDate,
-        endDate: actualEndDate,
-      }),
-    ["dashboard-data", actualStartDate, actualEndDate],
-    {
-      revalidate: revalidateTime,
-    },
-  )();
+  const cacheKeyStart = actualStartDate.split("T")[0];
+  const cacheKeyEnd = actualEndDate.split("T")[0];
+
+  const queryStartDate = `${cacheKeyStart}T00:00:00.000Z`;
+  const queryEndDate = `${cacheKeyEnd}T23:59:59.999Z`;
+
+  return fetchDashboardData({
+    startDate: queryStartDate,
+    endDate: queryEndDate,
+  });
 }
