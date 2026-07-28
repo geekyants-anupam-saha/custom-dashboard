@@ -148,59 +148,57 @@ export default function DashboardPage({
           </div>
         </div>
         <div>
-          {(dashboardData.instagram.mostViewedPost || mostViewedArticle) && (
+          {(dashboardData.instagram.mostViewedPost || mostViewedArticle || true) && (
             <h1 className={styles.heading}>What moved the audience</h1>
           )}
           <div className={styles.highlightGrid}>
-            {dashboardData.instagram.mostViewedPost && (
-              <HighlightCard
-                title="Most Viewed Post"
-                image={dashboardData.instagram.mostViewedPost.image}
-                avatar={<Instagram />}
-                username="@worldofus"
-                buttonText="See Post"
-                postLink={dashboardData.instagram.mostViewedPost.permalink}
-                stats={[
-                  {
-                    icon: <Eye size={18} />,
-                    value: dashboardData.instagram.mostViewedPost.views,
-                    label: "VIEWS",
-                  },
-                  {
-                    icon: <Bookmark size={18} color="#E3F24F" />,
-                    value: dashboardData.instagram.mostViewedPost.totalSaves,
-                    label: "SAVES",
-                  },
-                ]}
-              />
-            )}
+            <HighlightCard
+              title="Most Viewed Post"
+              isEmpty={!dashboardData.instagram.mostViewedPost}
+              emptyMessage="No posts available for the selected time period."
+              image={dashboardData.instagram.mostViewedPost?.image}
+              avatar={<Instagram />}
+              username="@worldofus"
+              buttonText="See Post"
+              postLink={dashboardData.instagram.mostViewedPost?.permalink}
+              stats={dashboardData.instagram.mostViewedPost ? [
+                {
+                  icon: <Eye size={18} />,
+                  value: dashboardData.instagram.mostViewedPost.views,
+                  label: "VIEWS",
+                },
+                {
+                  icon: <Bookmark size={18} color="#E3F24F" />,
+                  value: dashboardData.instagram.mostViewedPost.totalSaves,
+                  label: "SAVES",
+                },
+              ] : []}
+            />
 
-            {mostViewedArticle && (
-              <HighlightCard
-                title="Most Read Article"
-                image={
-                  mostViewedArticle.attributes.CoverImg?.data?.attributes?.url
-                }
-                heading={mostViewedArticle.attributes.Title}
-                buttonText="See Article"
-                postLink={`${process.env.NEXT_PUBLIC_URL}${mostViewedArticle.pagePath}`}
-                stats={[
-                  {
-                    icon: <Eye />,
-                    value: mostViewedArticle.pageViews,
-                    label: "VIEWS",
-                  },
-                  {
-                    icon: <Clock color="#E3F24F" />,
-                    value:
-                      averageSessionDuration >= 60
-                        ? `${Math.floor(averageSessionDuration / 60)} MINS`
-                        : `${Math.round(averageSessionDuration)} SEC`,
-                    label: "AVG TIME",
-                  },
-                ]}
-              />
-            )}
+            <HighlightCard
+              title="Most Read Article"
+              isEmpty={!mostViewedArticle}
+              emptyMessage="No articles available for the selected time period."
+              image={mostViewedArticle?.attributes?.CoverImg?.data?.attributes?.url}
+              heading={mostViewedArticle?.attributes?.Title}
+              buttonText="See Article"
+              postLink={mostViewedArticle ? `${process.env.NEXT_PUBLIC_URL}${mostViewedArticle.pagePath}` : undefined}
+              stats={mostViewedArticle ? [
+                {
+                  icon: <Eye />,
+                  value: mostViewedArticle.pageViews,
+                  label: "VIEWS",
+                },
+                {
+                  icon: <Clock color="#E3F24F" />,
+                  value:
+                    averageSessionDuration >= 60
+                      ? `${Math.floor(averageSessionDuration / 60)} MINS`
+                      : `${Math.round(averageSessionDuration)} SEC`,
+                  label: "AVG TIME",
+                },
+              ] : []}
+            />
           </div>
         </div>
       </div>

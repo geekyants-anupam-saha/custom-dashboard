@@ -22,6 +22,8 @@ interface HighlightCardProps {
   buttonText?: string;
 
   stats?: StatItem[];
+  isEmpty?: boolean;
+  emptyMessage?: string;
 }
 
 export default function HighlightCard({
@@ -33,6 +35,8 @@ export default function HighlightCard({
   postLink,
   buttonText = "VIEW",
   stats = [],
+  isEmpty = false,
+  emptyMessage = "Data not available",
 }: HighlightCardProps) {
   const Avatar = () => <div className={styles.avatar}>{avatar}</div>;
   return (
@@ -40,56 +44,64 @@ export default function HighlightCard({
       <h2 className={styles.cardTitle}>{title}</h2>
 
       <div className={styles.content}>
-        <div className={styles.imageWrapper}>
-          {image ? (
-            <img src={image} alt={heading || title} className={styles.image} />
-          ) : (
-            <div className={styles.imagePlaceholder}>No Image</div>
-          )}
-        </div>
-
-        <div className={styles.details}>
-          {(avatar || username) && (
-            <div className={styles.user}>
-              {avatar && <Avatar />}
-
-              <div>{username && <h4>{username}</h4>}</div>
+        {isEmpty ? (
+          <div className={styles.emptyState}>
+            <p>{emptyMessage}</p>
+          </div>
+        ) : (
+          <>
+            <div className={styles.imageWrapper}>
+              {image ? (
+                <img src={image} alt={heading || title} className={styles.image} />
+              ) : (
+                <div className={styles.imagePlaceholder}>No Image</div>
+              )}
             </div>
-          )}
 
-          {heading && <h3 className={styles.heading}>{heading}</h3>}
-          {stats.length > 0 && (
-            <div className={styles.stats}>
-              {stats.map((stat, index) => (
-                <React.Fragment key={stat.label}>
-                  <div className={styles.stat}>
-                    {stat.icon}
+            <div className={styles.details}>
+              {(avatar || username) && (
+                <div className={styles.user}>
+                  {avatar && <Avatar />}
 
-                    <span>
-                      {stat.value ?? 0} {stat.label}
-                    </span>
-                  </div>
-                  {index < stats.length - 1 && (
-                    <span className={styles.statDivider}>|</span>
-                  )}
-                </React.Fragment>
-              ))}
+                  <div>{username && <h4>{username}</h4>}</div>
+                </div>
+              )}
+
+              {heading && <h3 className={styles.heading}>{heading}</h3>}
+              {stats.length > 0 && (
+                <div className={styles.stats}>
+                  {stats.map((stat, index) => (
+                    <React.Fragment key={stat.label}>
+                      <div className={styles.stat}>
+                        {stat.icon}
+
+                        <span>
+                          {stat.value ?? 0} {stat.label}
+                        </span>
+                      </div>
+                      {index < stats.length - 1 && (
+                        <span className={styles.statDivider}>|</span>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
+
+              {postLink && (
+                <button
+                  className={styles.button}
+                  onClick={() => window.open(postLink, "_blank")}
+                >
+                  <span>
+                    {" "}
+                    {buttonText}
+                    <ArrowRight color="black" />
+                  </span>
+                </button>
+              )}
             </div>
-          )}
-
-          {postLink && (
-            <button
-              className={styles.button}
-              onClick={() => window.open(postLink, "_blank")}
-            >
-              <span>
-                {" "}
-                {buttonText}
-                <ArrowRight color="black" />
-              </span>
-            </button>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </article>
   );

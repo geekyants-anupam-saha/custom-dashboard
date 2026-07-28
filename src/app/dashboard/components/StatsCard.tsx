@@ -23,7 +23,7 @@ export default function StatsCard({
       </div>
 
       <div className={styles.content}>
-        <h2>{Number(value).toLocaleString()}</h2>
+        <h2>{value == null || value === "N/A" ? "N/A" : typeof value === 'number' ? value.toLocaleString() : value}</h2>
         <div className={styles.titleWrapper}>
           <h3>{title}</h3>
           {tooltip && (
