@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Info } from "lucide-react";
 import styles from "./StatsCard.module.scss";
-import Tooltip from "@/components/Tooltip";
+import Tooltip from "@/components/tooltip/Tooltip";
 
 interface StatsCardProps {
   title: string;

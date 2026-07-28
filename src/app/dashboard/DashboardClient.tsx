@@ -13,11 +13,11 @@ import Game from "@/components/icons/Game";
 import People from "@/components/icons/People";
 import Clock from "@/components/icons/Clock";
 import Eye from "@/components/icons/Eye";
-import DashboardHeader from "./components/DashboardHeader";
-import StatsCard from "./components/StatsCard";
-import HighlightCard from "./components/HighlightCard";
+import DashboardHeader from "./components/DashboardHeader/DashboardHeader";
+import StatsCard from "./components/StatsCard/StatsCard";
+import HighlightCard from "./components/HighlightCard/HighlightCard";
 import { getTimeAgo } from "../../../utils";
-import DashboardSkeleton from "./components/DashboardSkeleton";
+import DashboardSkeleton from "./components/DashboardSkeleton/DashboardSkeleton";
 import Instagram from "@/components/icons/Instagram";
 
 interface DashboardPageProps {

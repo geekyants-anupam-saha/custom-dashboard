@@ -67,10 +67,12 @@ const getInstagramDataCached = unstable_cache(
           const data = await res.json();
           const fetchedPosts = data.data ?? [];
           allPosts.push(...fetchedPosts);
-          
+
           if (fetchedPosts.length > 0) {
             const oldestPostInBatch = fetchedPosts[fetchedPosts.length - 1];
-            if (new Date(oldestPostInBatch.timestamp).getTime() < rangeStartTime) {
+            if (
+              new Date(oldestPostInBatch.timestamp).getTime() < rangeStartTime
+            ) {
               break;
             }
           }
@@ -91,7 +93,8 @@ const getInstagramDataCached = unstable_cache(
         caption: item.caption,
         mediaUrl: item.media_url,
         thumbnailUrl: item.thumbnail_url,
-        image: item.media_type === "VIDEO" ? item.thumbnail_url : item.media_url,
+        image:
+          item.media_type === "VIDEO" ? item.thumbnail_url : item.media_url,
         mediaType: item.media_type,
         permalink: item.permalink,
         timestamp: item.timestamp,
@@ -115,22 +118,22 @@ const getInstagramDataCached = unstable_cache(
         mostViewedPost,
       };
     } catch (err) {
-      throw new Error(`Failed to fetch Instagram data: ${err instanceof Error ? err.message : String(err)}`);
+      throw new Error(
+        `Failed to fetch Instagram data: ${err instanceof Error ? err.message : String(err)}`,
+      );
     }
   },
   ["instagram-data-optimized"],
-  { revalidate: revalidateTime }
+  { revalidate: revalidateTime },
 );
 
 async function getInstagramData(range: DashboardDateRange) {
   return unstable_cache(
     () => getInstagramDataCached(range),
     ["instagram-data-optimized", range.startDate, range.endDate],
-    { revalidate: revalidateTime }
+    { revalidate: revalidateTime },
   )();
 }
-
-
 
 async function getSeedPlanted() {
   try {
@@ -159,7 +162,9 @@ async function getSeedPlanted() {
       sessions: planted?.distinctSessions ?? 0,
     };
   } catch (err) {
-    throw new Error(`Failed to fetch planting metrics: ${err instanceof Error ? err.message : String(err)}`);
+    throw new Error(
+      `Failed to fetch planting metrics: ${err instanceof Error ? err.message : String(err)}`,
+    );
   }
 }
 
@@ -246,7 +251,9 @@ async function getAnalyticsPageVisits(range: DashboardDateRange) {
       }) ?? []
     );
   } catch (err) {
-    throw new Error(`Failed to fetch Google Analytics data: ${err instanceof Error ? err.message : String(err)}`);
+    throw new Error(
+      `Failed to fetch Google Analytics data: ${err instanceof Error ? err.message : String(err)}`,
+    );
   }
 }
 const getAllArticlesCached = unstable_cache(
@@ -258,11 +265,13 @@ const getAllArticlesCached = unstable_cache(
         pageSize: 1000,
       });
     } catch (err) {
-      throw new Error(`Failed to fetch articles data: ${err instanceof Error ? err.message : String(err)}`);
+      throw new Error(
+        `Failed to fetch articles data: ${err instanceof Error ? err.message : String(err)}`,
+      );
     }
   },
   ["all-articles-v2"],
-  { revalidate: revalidateTime }
+  { revalidate: revalidateTime },
 );
 
 async function fetchDashboardData(range: DashboardDateRange) {
@@ -313,7 +322,9 @@ async function fetchDashboardData(range: DashboardDateRange) {
       mostViewedArticle,
     };
   } catch (err) {
-    throw new Error(`Dashboard data fetch failed: ${err instanceof Error ? err.message : String(err)}`);
+    throw new Error(
+      `Dashboard data fetch failed: ${err instanceof Error ? err.message : String(err)}`,
+    );
   }
 }
 

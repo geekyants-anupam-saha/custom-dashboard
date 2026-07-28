@@ -52,7 +52,11 @@ export default function HighlightCard({
           <>
             <div className={styles.imageWrapper}>
               {image ? (
-                <img src={image} alt={heading || title} className={styles.image} />
+                <img
+                  src={image}
+                  alt={heading || title}
+                  className={styles.image}
+                />
               ) : (
                 <div className={styles.imagePlaceholder}>No Image</div>
               )}
