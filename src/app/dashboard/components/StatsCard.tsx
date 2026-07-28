@@ -1,41 +1,37 @@
 import { ReactNode } from "react";
+import { Info } from "lucide-react";
 import styles from "./StatsCard.module.scss";
+import Tooltip from "@/components/Tooltip";
 
 interface StatsCardProps {
   title: string;
   value: string | number;
   icon: ReactNode;
-  growth?: number;
-  growthType?: "positive" | "negative";
+  tooltip?: string;
 }
 
 export default function StatsCard({
   title,
   value,
   icon,
-  growth,
-  growthType = "positive",
+  tooltip,
 }: StatsCardProps) {
   return (
     <article className={styles.card}>
       <div className={styles.top}>
         <div className={styles.iconWrapper}>{icon}</div>
-
-        {growth !== undefined && (
-          <div
-            className={`${styles.badge} ${
-              growthType === "positive" ? styles.positive : styles.negative
-            }`}
-          >
-            {growthType === "positive" ? "↗" : "↘"} {growth}%
-          </div>
-        )}
       </div>
 
       <div className={styles.content}>
-        <h3>{title}</h3>
-
         <h2>{Number(value).toLocaleString()}</h2>
+        <div className={styles.titleWrapper}>
+          <h3>{title}</h3>
+          {tooltip && (
+            <Tooltip content={tooltip}>
+              <Info size={16} className={styles.infoIcon} />
+            </Tooltip>
+          )}
+        </div>
       </div>
     </article>
   );

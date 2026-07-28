@@ -1,6 +1,6 @@
-import Image from "next/image";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import styles from "./HighlightCard.module.scss";
+import ArrowRight from "@/components/icons/ArrowRight";
 
 interface StatItem {
   icon: ReactNode;
@@ -13,11 +13,9 @@ interface HighlightCardProps {
   image?: string;
 
   heading?: string;
-  description?: string;
 
-  avatar?: string;
+  avatar?: ReactNode;
   username?: string;
-  subText?: string;
 
   postLink?: string;
 
@@ -30,127 +28,68 @@ export default function HighlightCard({
   title,
   image,
   heading,
-  description,
   avatar,
   username,
-  subText,
   postLink,
   buttonText = "VIEW",
   stats = [],
 }: HighlightCardProps) {
+  const Avatar = () => <div className={styles.avatar}>{avatar}</div>;
   return (
     <article className={styles.card}>
-      <h2 className={styles.cardTitle}>
-        {title}
-      </h2>
-
+      <h2 className={styles.cardTitle}>{title}</h2>
 
       <div className={styles.content}>
-
-        {/* IMAGE */}
         <div className={styles.imageWrapper}>
           {image ? (
-            <img
-              src={image}
-              alt={heading || title}
-              className={styles.image}
-            />
+            <img src={image} alt={heading || title} className={styles.image} />
           ) : (
-            <div className={styles.imagePlaceholder}>
-              No Image
-            </div>
+            <div className={styles.imagePlaceholder}>No Image</div>
           )}
         </div>
 
-
-
-        {/* DETAILS */}
         <div className={styles.details}>
-
-
-          {/* USER */}
           {(avatar || username) && (
             <div className={styles.user}>
-              {avatar && (
-                <Image
-                  src={avatar}
-                  width={48}
-                  height={48}
-                  alt={username ?? ""}
-                  className={styles.avatar}
-                />
-              )}
+              {avatar && <Avatar />}
 
-              <div>
-                {username && (
-                  <h4>{username}</h4>
-                )}
-
-                {subText && (
-                  <span>{subText}</span>
-                )}
-              </div>
+              <div>{username && <h4>{username}</h4>}</div>
             </div>
           )}
 
-
-
-          {/* TITLE */}
-          {heading && (
-            <h3 className={styles.heading}>
-              {heading}
-            </h3>
-          )}
-
-
-
-          {/* DESCRIPTION */}
-          {description && (
-            <p className={styles.description}>
-              {description}
-            </p>
-          )}
-
-
-
-          {/* STATS */}
+          {heading && <h3 className={styles.heading}>{heading}</h3>}
           {stats.length > 0 && (
             <div className={styles.stats}>
-              {stats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className={styles.stat}
-                >
-                  {stat.icon}
+              {stats.map((stat, index) => (
+                <React.Fragment key={stat.label}>
+                  <div className={styles.stat}>
+                    {stat.icon}
 
-                  <span>
-                    {stat.value ?? 0} {stat.label}
-                  </span>
-                </div>
+                    <span>
+                      {stat.value ?? 0} {stat.label}
+                    </span>
+                  </div>
+                  {index < stats.length - 1 && (
+                    <span className={styles.statDivider}>|</span>
+                  )}
+                </React.Fragment>
               ))}
             </div>
           )}
 
-
-
-          {/* BUTTON */}
           {postLink && (
             <button
               className={styles.button}
-              onClick={() =>
-                window.open(postLink, "_blank")
-              }
+              onClick={() => window.open(postLink, "_blank")}
             >
-              {buttonText}
-
               <span>
-                →
+                {" "}
+                {buttonText}
+                <ArrowRight color="black" />
               </span>
             </button>
           )}
-
         </div>
-
       </div>
     </article>
   );

@@ -1,23 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Bookmark,
-  Clock3,
-  Eye,
-  Gamepad2,
-  Sprout,
-  UsersRound,
-} from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState, useEffect } from "react";
+import { CalendarDays, ChevronDown, Bookmark, RotateCcw } from "lucide-react";
+
+import DateRangeModal from "./components/DateRangeModal/DateRangeModal";
+import { getRangeByKey } from "./components/DateRangeModal/dateRanges";
 
 import styles from "./page.module.scss";
-
+import Plant from "@/components/icons/Plant";
+import Game from "@/components/icons/Game";
+import People from "@/components/icons/People";
+import Clock from "@/components/icons/Clock";
+import Eye from "@/components/icons/Eye";
 import DashboardHeader from "./components/DashboardHeader";
 import StatsCard from "./components/StatsCard";
 import HighlightCard from "./components/HighlightCard";
 import { getTimeAgo } from "../../../utils";
 import DashboardSkeleton from "./components/DashboardSkeleton";
+import Instagram from "@/components/icons/Instagram";
 
 interface DashboardPageProps {
   dashboardData: {
@@ -46,6 +47,8 @@ export default function DashboardPage({
   dashboardData: initialDashboardData,
 }: DashboardPageProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [open, setOpen] = useState(false);
   const dashboardData = initialDashboardData;
   const mostViewedArticle = dashboardData.mostViewedArticle;
   const [loading, setLoading] = useState(false);
@@ -53,6 +56,27 @@ export default function DashboardPage({
   useEffect(() => {
     setLoading(false);
   }, [dashboardData]);
+
+  const selectedRange = useMemo(() => {
+    const range = searchParams.get("range");
+    return getRangeByKey(range ?? "lastYear");
+  }, [searchParams]);
+
+  const customStart = searchParams.get("startDate");
+  const customEnd = searchParams.get("endDate");
+
+  const displayDate =
+    customStart && customEnd
+      ? `${new Date(customStart).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })} - ${new Date(customEnd).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })}`
+      : selectedRange.displayRange;
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", {
@@ -68,31 +92,58 @@ export default function DashboardPage({
     return <DashboardSkeleton />;
   }
   return (
-    <div>
-      <DashboardHeader
-        onLogout={handleLogout}
-        onDateSelect={() => setLoading(true)}
-      />
+    <div className={styles.pageWrapper}>
+      <DashboardHeader onLogout={handleLogout} />
       <div className={styles.container}>
+        <div className={styles.controlsRow}>
+          <div className={styles.dateWrapper}>
+            <button
+              className={styles.dateButtonText}
+              onClick={() => setOpen((prev) => !prev)}
+            >
+              <CalendarDays color="var(--text-muted)" size={16} />
+              <span>{selectedRange.label}</span>
+              <span className={styles.date}>{displayDate}</span>
+              <ChevronDown
+                color="var(--text-muted)"
+                size={14}
+                className={open ? styles.rotate : ""}
+              />
+            </button>
+            <DateRangeModal
+              open={open}
+              onClose={() => setOpen(false)}
+              onSelect={() => setLoading(true)}
+            />
+          </div>
+
+          <div className={styles.lastUpdated}>
+            <RotateCcw color="var(--text-muted)" size={14} />
+            <span>Last Updated: Jul 26, 2026</span>
+          </div>
+        </div>
+
         <div>
           <h1 className={styles.heading}>Overview</h1>
           <div className={styles.statsGrid}>
             <StatsCard
               title="Seeds Planted"
               value={dashboardData.game.seedPlanted.count}
-              icon={<Sprout />}
+              icon={<Plant />}
+              tooltip="This is all time data"
             />
 
             <StatsCard
               title="Web Playthroughs"
               value={dashboardData.game.webPlaythroughs ?? 0}
-              icon={<Gamepad2 />}
+              icon={<Game />}
             />
 
             <StatsCard
               title="Follower Count"
               value={dashboardData.instagram.followersCount}
-              icon={<UsersRound />}
+              icon={<People />}
+              tooltip="This is all time data"
             />
           </div>
         </div>
@@ -105,12 +156,9 @@ export default function DashboardPage({
               <HighlightCard
                 title="Most Viewed Post"
                 image={dashboardData.instagram.mostViewedPost.image}
-                avatar="/instagram.avif"
+                avatar={<Instagram />}
                 username="@worldofus"
-                buttonText="View Post"
-                subText={getTimeAgo(
-                  dashboardData.instagram.mostViewedPost.timestamp,
-                )}
+                buttonText="See Post"
                 postLink={dashboardData.instagram.mostViewedPost.permalink}
                 stats={[
                   {
@@ -119,7 +167,7 @@ export default function DashboardPage({
                     label: "VIEWS",
                   },
                   {
-                    icon: <Bookmark size={18} />,
+                    icon: <Bookmark size={18} color="#E3F24F" />,
                     value: dashboardData.instagram.mostViewedPost.totalSaves,
                     label: "SAVES",
                   },
@@ -134,22 +182,16 @@ export default function DashboardPage({
                   mostViewedArticle.attributes.CoverImg?.data?.attributes?.url
                 }
                 heading={mostViewedArticle.attributes.Title}
-                buttonText="Read Article"
-                description={
-                  mostViewedArticle.attributes.ShortDes?.replace(
-                    /<[^>]*>/g,
-                    "",
-                  ) ?? ""
-                }
+                buttonText="See Article"
                 postLink={`${process.env.NEXT_PUBLIC_URL}${mostViewedArticle.pagePath}`}
                 stats={[
                   {
-                    icon: <Eye size={18} />,
+                    icon: <Eye />,
                     value: mostViewedArticle.pageViews,
                     label: "VIEWS",
                   },
                   {
-                    icon: <Clock3 size={18} />,
+                    icon: <Clock color="#E3F24F" />,
                     value:
                       averageSessionDuration >= 60
                         ? `${Math.floor(averageSessionDuration / 60)} MINS`

@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: space-between;
 
-  padding: 0 42px;
+  padding: 40px;
 
   border-bottom: 1px solid var(--border);
 
@@ -51,7 +51,6 @@
     background: var(--border);
   }
 
-
   svg:last-child {
     transition: transform 0.25s ease;
   }
@@ -80,7 +79,7 @@
 
   padding: 10px 18px;
 
-  border: 1px solid var(--border);
+  border: none;
   border-radius: 999px;
 
   background: transparent;

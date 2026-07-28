@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.scss";
 import AuthLayout from "@/components/layout/AuthLayout";
-import Login from "@/components/icons/Login";
+import Exit from "@/components/icons/Exit";
 import ArrowRight from "@/components/icons/ArrowRight";
 
 export default function HomePage() {
@@ -71,7 +71,7 @@ export default function HomePage() {
   return (
     <AuthLayout>
       <div className={styles.iconBox}>
-        <Login />
+        <Exit />
       </div>
 
       <p className={styles.signInHeading}>Sign in</p>
