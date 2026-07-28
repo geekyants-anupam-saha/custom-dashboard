@@ -136,8 +136,7 @@ export default function OtpPage() {
       <p className={styles.heading}>Check your email</p>
 
       <p className={styles.subtitle}>
-        We've sent a 6-digit code to{" "}
-        <strong>{email}</strong>
+        We've sent a 6-digit code to <strong>{email}</strong>
       </p>
 
       <form onSubmit={handleVerifyOtp} className={styles.form}>
@@ -157,9 +156,9 @@ export default function OtpPage() {
           <div className={styles.resendContainer}>
             <div> {error && <span className={styles.error}>{error}</span>}</div>
             {timer > 0 ? (
-              <>
+              <div>
                 Resend code in <strong>{timer}s</strong>
-              </>
+              </div>
             ) : (
               <button
                 type="button"
