@@ -17,8 +17,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 
         <div className={styles.sidebarContent}>
           <h1>
-            Stories, Myths &
-            <br />A Caring World.
+            Stories, Myths & A Caring World.
           </h1>
 
           <p>

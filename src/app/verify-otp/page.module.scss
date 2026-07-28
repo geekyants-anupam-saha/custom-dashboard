@@ -6,7 +6,7 @@
   align-items: center;
   gap: 8px;
 
-  margin-bottom: 34px;
+  margin-bottom: 24px;
 
   padding: 0;
 
@@ -29,7 +29,7 @@
   }
 }
 
-.signInHeading {
+.heading {
   font-weight: 700;
   font-style: italic;
   font-size: 28px;
@@ -41,14 +41,14 @@
   position: relative;
   z-index: 2;
 
-  width: 42px;
-  height: 42px;
-
   display: flex;
+  width: fit-content;
   align-items: center;
   justify-content: center;
 
-  margin-bottom: 24px;
+  padding: 14px 20px;
+
+  margin-bottom: 22px;
 
   border-radius: 12px;
 
@@ -78,8 +78,8 @@
   position: relative;
   z-index: 2;
 
-  margin-top: 10px;
-  margin-bottom: 40px;
+  margin-top: 8px;
+  margin-bottom: 24px;
 
   color: var(--text-secondary);
 
@@ -140,10 +140,9 @@
   position: relative;
   z-index: 2;
 
-  margin-top: 12px;
-  margin-bottom: 28px;
-
-  align-self: flex-end;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  align-self: stretch;
 
   color: var(--white-58);
 
@@ -154,25 +153,29 @@
     font-weight: 500;
   }
 }
+.resendContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
 .resendBtn {
   background: transparent;
   border: none;
   padding: 0;
-  
+
   color: var(--primary);
   font-size: 13px;
   font-weight: 500;
-  
-  text-decoration: underline;
+
   cursor: pointer;
-  
+
   transition: opacity 0.25s ease;
-  
+
   &:hover {
     opacity: 0.75;
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -191,6 +194,7 @@
   padding: 12px 30px;
 
   border-radius: 999px;
+  margin: 10px;
 
   border: 1px solid var(--border-strong);
 
@@ -219,18 +223,53 @@
     cursor: not-allowed;
   }
 }
+.verifyBtnDisabled {
+  position: relative;
+  z-index: 2;
+
+  align-self: center;
+
+  min-width: 180px;
+
+  padding: 12px 30px;
+
+  border-radius: 999px;
+  margin: 10px;
+
+  border: 1px solid var(--border-strong);
+
+  background: var(--lime);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  color: var(--black-30);
+
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
 
 .footerText {
   position: relative;
   z-index: 2;
 
-  margin-top: 34px;
+  margin-top: 12px;
 
   text-align: center;
 
   color: var(--white-58);
 
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.7;
 
   button {
@@ -243,8 +282,6 @@
 
     font: inherit;
 
-    text-decoration: underline;
-
     cursor: pointer;
 
     &:hover {
@@ -252,12 +289,14 @@
     }
   }
 }
-
+.anotherMail {
+  text-decoration: underline;
+}
 .error {
   position: relative;
   z-index: 2;
 
-  margin-bottom: 18px;
+  margin-bottom: 0;
 
   color: var(--danger-light);
 

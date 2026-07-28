@@ -18,16 +18,16 @@ export default function OtpPage() {
   const [timer, setTimer] = useState(21);
   const [isResending, setIsResending] = useState(false);
 
-  useEffect(() => {
-    const savedEmail = sessionStorage.getItem("email");
+  // useEffect(() => {
+  //   const savedEmail = sessionStorage.getItem("email");
 
-    if (!savedEmail) {
-      router.replace("/");
-      return;
-    }
+  //   if (!savedEmail) {
+  //     router.replace("/");
+  //     return;
+  //   }
 
-    setEmail(savedEmail);
-  }, [router]);
+  //   setEmail(savedEmail);
+  // }, [router]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -133,10 +133,11 @@ export default function OtpPage() {
         <Clock size={50} />
       </div>
 
-      <p className={styles.signInHeading}>Check your email</p>
+      <p className={styles.heading}>Check your email</p>
 
       <p className={styles.subtitle}>
-        We've sent a 6-digit code to <strong>{email}</strong>
+        We've sent a 6-digit code to{" "}
+        <strong>{email}lokeshkumar@geekyants.com</strong>
       </p>
 
       <form onSubmit={handleVerifyOtp} className={styles.form}>
@@ -145,7 +146,7 @@ export default function OtpPage() {
           value={otp}
           maxLength={6}
           inputMode="numeric"
-          placeholder="X X X X X X"
+          placeholder="XXXXXX"
           onChange={(e) => {
             setOtp(e.target.value.replace(/\D/g, ""));
             if (error) setError("");
@@ -153,32 +154,40 @@ export default function OtpPage() {
         />
 
         <div className={styles.resend}>
-          {timer > 0 ? (
-            <>
-              Resend code in <strong>{timer}s</strong>
-            </>
-          ) : (
-            <button
-              type="button"
-              className={styles.resendBtn}
-              onClick={handleResendOtp}
-              disabled={isResending}
-            >
-              {isResending ? "Resending..." : "Resend OTP"}
-            </button>
-          )}
+          <div className={styles.resendContainer}>
+            <div> {error && <span className={styles.error}>{error}</span>}</div>
+            {timer > 0 ? (
+              <>
+                Resend code in <strong>{timer}s</strong>
+              </>
+            ) : (
+              <button
+                type="button"
+                className={styles.resendBtn}
+                onClick={handleResendOtp}
+                disabled={isResending}
+              >
+                {isResending ? "Resending..." : "Resend OTP"}
+              </button>
+            )}
+          </div>
         </div>
 
-        {error && <span className={styles.error}>{error}</span>}
-
-        <button className={styles.verifyBtn} disabled={isVerifyingOtp}>
+        <button
+          className={otp ? styles.verifyBtnDisabled : styles.verifyBtn}
+          disabled={isVerifyingOtp || !otp}
+        >
           {isVerifyingOtp ? "VERIFYING..." : "VERIFY & SIGN IN"}
         </button>
       </form>
 
       <p className={styles.footerText}>
         Didn't get it? Check your spam folder or{" "}
-        <button type="button" onClick={() => router.push("/")}>
+        <button
+          type="button"
+          className={styles.anotherMail}
+          onClick={() => router.push("/")}
+        >
           try another email.
         </button>
       </p>
