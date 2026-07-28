@@ -34,11 +34,11 @@
   --success-light: #53d37e;
   --success-bg: rgba(48, 190, 110, 0.18);
   --danger: red;
-  --danger-light: #ff8fa3;
+  --danger-light: #ff3b30;
   --danger-accent: #ff6b6b;
   --danger-bg: rgba(231, 76, 60, 0.18);
   --wheat: #f8dd80;
-
+  --lime: #e3f24f;
   --surface-hover: rgba(255, 255, 255, 0.04);
   --surface-glass: rgba(70, 25, 60, 0.75);
 
