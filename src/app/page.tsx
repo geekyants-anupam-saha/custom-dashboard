@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import styles from "./page.module.scss";
-import Logo from "@/components/icons/Logo";
+import AuthLayout from "@/components/layout/AuthLayout";
+import Login from "@/components/icons/Login";
+import ArrowRight from "@/components/icons/ArrowRight";
 
 export default function HomePage() {
   const router = useRouter();
@@ -12,7 +13,6 @@ export default function HomePage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [isSendingOtp, setIsSendingOtp] = useState(false);
-
 
   const handleSendOtp = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -69,75 +69,50 @@ export default function HomePage() {
   };
 
   return (
-    <div className={styles.page}>
-      <Image
-        src="/loginbg.png"
-        alt="Background"
-        fill
-        priority
-        className={styles.background}
-      />
-
-      <div className={styles.overlay} />
-
-      {/* Left Panel */}
-      <div className={styles.sidebar}>
-        <div className={styles.logo}>
-          <Logo />
-        </div>
-
-        <div className={styles.sidebarContent}>
-          <h1>
-            Stories, Myths &
-            <br />A Caring World.
-          </h1>
-
-          <p>
-            Your personal analytics dashboard for tracking the stories that
-            matter most.
-          </p>
-        </div>
+    <AuthLayout>
+      <div className={styles.iconBox}>
+        <Login />
       </div>
 
-      {/* Login Card */}
-      <div className={styles.content}>
-        <div className={styles.card}>
-          <div className={styles.iconBox}>→</div>
+      <p className={styles.signInHeading}>Sign in</p>
 
-          <h2>Sign in</h2>
+      <p className={styles.subtitle}>
+        Enter your email and we'll send you a one-time code.
+      </p>
 
-          <p className={styles.subtitle}>
-            Enter your email and we'll send you a one-time code.
-          </p>
+      <form onSubmit={handleSendOtp} className={styles.form}>
+        <input
+          id="email"
+          type="email"
+          value={email}
+          placeholder="Your Email"
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setError("");
+          }}
+          disabled={isSendingOtp}
+        />
 
-          <form onSubmit={handleSendOtp} className={styles.form}>
-            <label htmlFor="email">Your Email</label>
+        {error && <span className={styles.error}>{error}</span>}
 
-            <input
-              id="email"
-              type="email"
-              value={email}
-              placeholder="Enter your email"
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setError("");
-              }}
-              disabled={isSendingOtp}
-            />
+        <p className={styles.terms}>
+          By signing in you agree to our{" "}
+          <a href="#" className={styles.anchor}>
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a href="#" className={styles.anchor}>
+            Privacy Policy
+          </a>
+          .
+        </p>
 
-            {error && <span className={styles.error}>{error}</span>}
-
-            <p className={styles.terms}>
-              By signing in you agree to our <a href="#">Terms of Service</a>{" "}
-              and <a href="#">Privacy Policy</a>.
-            </p>
-
-            <button type="submit" disabled={isSendingOtp}>
-              {isSendingOtp ? "Sending..." : "SUBMIT →"}
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
+        <button type="submit" disabled={isSendingOtp}>
+          <span className={styles.buttonText}>
+            {isSendingOtp ? "Sending..." : "SUBMIT"} <ArrowRight />
+          </span>
+        </button>
+      </form>
+    </AuthLayout>
   );
 }

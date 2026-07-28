@@ -23,7 +23,7 @@
 
   border-radius: 16px;
 
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--border);
 
   display: flex;
   align-items: center;
@@ -48,13 +48,13 @@
 }
 
 .positive {
-  background: rgba(48, 190, 110, 0.18);
-  color: #53d37e;
+  background: var(--success-bg);
+  color: var(--success-light);
 }
 
 .negative {
-  background: rgba(231, 76, 60, 0.18);
-  color: #ff6b6b;
+  background: var(--danger-bg);
+  color: var(--danger-accent);
 }
 
 .content {

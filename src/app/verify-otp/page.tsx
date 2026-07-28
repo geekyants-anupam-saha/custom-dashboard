@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.scss";
-import { Clock } from "lucide-react";
-import Logo from "@/components/icons/Logo";
+import AuthLayout from "@/components/layout/AuthLayout";
+import Clock from "@/components/icons/Clock";
+import { ArrowLeft } from "lucide-react";
 
 export default function OtpPage() {
   const router = useRouter();
@@ -14,6 +14,9 @@ export default function OtpPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+
+  const [timer, setTimer] = useState(21);
+  const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
     const savedEmail = sessionStorage.getItem("email");
@@ -25,6 +28,50 @@ export default function OtpPage() {
 
     setEmail(savedEmail);
   }, [router]);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timer]);
+
+  const handleResendOtp = async () => {
+    if (isResending) return;
+    setIsResending(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Failed to resend OTP.");
+      }
+
+      setTimer(21);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   const handleVerifyOtp = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -73,87 +120,76 @@ export default function OtpPage() {
   };
 
   return (
-    <div className={styles.page}>
-      <Image
-        src="/loginbg.png"
-        alt=""
-        fill
-        priority
-        className={styles.background}
-      />
+    <AuthLayout>
+      <button
+        className={styles.changeEmail}
+        type="button"
+        onClick={() => router.push("/")}
+      >
+        <ArrowLeft /> Change Email
+      </button>
 
-      <div className={styles.overlay} />
-
-      <aside className={styles.sidebar}>
-        <div className={styles.logo}>
-          <Logo />
-        </div>
-
-        <div className={styles.sidebarContent}>
-          <h1>
-            Stories, Myths &
-            <br />A Caring World.
-          </h1>
-
-          <p>
-            Your personal analytics dashboard for tracking the stories that
-            matter most.
-          </p>
-        </div>
-      </aside>
-
-      <div className={styles.content}>
-        <div className={styles.card}>
-          <button
-            className={styles.changeEmail}
-            type="button"
-            onClick={() => router.push("/")}
-          >
-            ← Change Email
-          </button>
-
-          <div className={styles.iconBox}>
-            <Clock size={50} />
-          </div>
-
-          <h2>Check your email</h2>
-
-          <p className={styles.subtitle}>
-            We've sent a 6-digit code to <strong>{email}</strong>
-          </p>
-
-          <form onSubmit={handleVerifyOtp} className={styles.form}>
-            <input
-              type="text"
-              value={otp}
-              maxLength={6}
-              inputMode="numeric"
-              placeholder="X X X X X X"
-              onChange={(e) => {
-                setOtp(e.target.value.replace(/\D/g, ""));
-                if (error) setError("");
-              }}
-            />
-
-            <div className={styles.resend}>
-              Resend code in <strong>21s</strong>
-            </div>
-
-            {error && <span className={styles.error}>{error}</span>}
-
-            <button className={styles.verifyBtn} disabled={isVerifyingOtp}>
-              {isVerifyingOtp ? "VERIFYING..." : "VERIFY & SIGN IN"}
-            </button>
-          </form>
-
-          <p className={styles.footerText}>
-            Didn't get it? Check your spam folder or{" "}
-            <button type="button" onClick={() => router.push("/")}>
-              try another email.
-            </button>
-          </p>
-        </div>
+      <div className={styles.iconBox}>
+        <Clock size={50} />
       </div>
-    </div>
+
+      <p className={styles.heading}>Check your email</p>
+
+      <p className={styles.subtitle}>
+        We've sent a 6-digit code to <strong>{email}</strong>
+      </p>
+
+      <form onSubmit={handleVerifyOtp} className={styles.form}>
+        <input
+          type="text"
+          value={otp}
+          maxLength={6}
+          inputMode="numeric"
+          placeholder="XXXXXX"
+          onChange={(e) => {
+            setOtp(e.target.value.replace(/\D/g, ""));
+            if (error) setError("");
+          }}
+        />
+
+        <div className={styles.resend}>
+          <div className={styles.resendContainer}>
+            <div> {error && <span className={styles.error}>{error}</span>}</div>
+            {timer > 0 ? (
+              <div>
+                Resend code in <strong>{timer}s</strong>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className={styles.resendBtn}
+                onClick={handleResendOtp}
+                disabled={isResending}
+              >
+                {isResending ? "Resending..." : "Resend OTP"}
+              </button>
+            )}
+          </div>
+        </div>
+
+        <button
+          className={otp ? styles.verifyBtnDisabled : styles.verifyBtn}
+          disabled={isVerifyingOtp || !otp}
+        >
+          {isVerifyingOtp ? "VERIFYING..." : "VERIFY & SIGN IN"}
+        </button>
+      </form>
+
+      <p className={styles.footerText}>
+        Didn't get it? Check your spam folder or{" "}
+        <button
+          type="button"
+          className={styles.anotherMail}
+          onClick={() => router.push("/")}
+        >
+          try another email.
+        </button>
+      </p>
+    </AuthLayout>
   );
 }

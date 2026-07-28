@@ -65,7 +65,7 @@
 
   border-radius: 20px;
 
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--white-5);
 }
 
 .icon {
@@ -102,7 +102,7 @@
 
   border-radius: 24px;
 
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--white-5);
 }
 
 .image {
@@ -165,9 +165,9 @@
 .stat {
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.06) 25%,
-    rgba(255, 255, 255, 0.12) 50%,
-    rgba(255, 255, 255, 0.06) 75%
+    var(--white-6) 25%,
+    var(--white-12) 50%,
+    var(--white-6) 75%
   );
 
   background-size: 200% 100%;

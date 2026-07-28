@@ -1,9 +1,9 @@
 .card {
-  background: rgba(70, 25, 60, 0.75);
+  background: var(--surface-glass);
   border-radius: 24px;
   padding: 20px;
   height: 310px;
-  color: white;
+  color: var(--primary);
 
   overflow: hidden;
 }
@@ -44,7 +44,7 @@
   align-items: center;
   justify-content: center;
 
-  background: #32152e;
+  background: var(--surface);
 }
 
 .details {
@@ -146,7 +146,7 @@
 
   background: var(--accent);
 
-  color: #000;
+  color: var(--black);
 
   font-weight: 500;
 
