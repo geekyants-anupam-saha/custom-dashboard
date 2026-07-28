@@ -18,16 +18,16 @@ export default function OtpPage() {
   const [timer, setTimer] = useState(21);
   const [isResending, setIsResending] = useState(false);
 
-  // useEffect(() => {
-  //   const savedEmail = sessionStorage.getItem("email");
+  useEffect(() => {
+    const savedEmail = sessionStorage.getItem("email");
 
-  //   if (!savedEmail) {
-  //     router.replace("/");
-  //     return;
-  //   }
+    if (!savedEmail) {
+      router.replace("/");
+      return;
+    }
 
-  //   setEmail(savedEmail);
-  // }, [router]);
+    setEmail(savedEmail);
+  }, [router]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -137,7 +137,7 @@ export default function OtpPage() {
 
       <p className={styles.subtitle}>
         We've sent a 6-digit code to{" "}
-        <strong>{email}lokeshkumar@geekyants.com</strong>
+        <strong>{email}</strong>
       </p>
 
       <form onSubmit={handleVerifyOtp} className={styles.form}>
