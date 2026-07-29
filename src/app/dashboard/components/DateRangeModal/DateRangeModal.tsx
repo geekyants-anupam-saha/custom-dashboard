@@ -34,10 +34,10 @@ export default function DateRangeModal({
 
   const currentStartIso =
     searchParams.get("startDate") ??
-    ranges.find((r) => r.key === "lastYear")?.startDate;
+    ranges.find((r) => r.key === "lastMonth")?.startDate;
   const currentEndIso =
     searchParams.get("endDate") ??
-    ranges.find((r) => r.key === "lastYear")?.endDate;
+    ranges.find((r) => r.key === "lastMonth")?.endDate;
 
   const toYYYYMMDD = (isoString?: string | null) => {
     if (!isoString) return "";

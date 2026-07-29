@@ -341,7 +341,7 @@ export async function getDashboardData(startDate?: string, endDate?: string) {
   const actualStartDate =
     startDate ??
     new Date(
-      new Date().setFullYear(new Date().getFullYear() - 1),
+      new Date().setMonth(new Date().getMonth() - 1),
     ).toISOString();
   const actualEndDate = endDate ?? new Date().toISOString();
 
