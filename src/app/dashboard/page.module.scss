@@ -1,9 +1,62 @@
+.pageWrapper {
+  min-height: 100vh;
+  background-color: var(--background);
+}
+
 .container {
   padding: 36px 42px;
 
   display: flex;
   flex-direction: column;
   gap: 28px;
+}
+
+.controlsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+}
+
+.dateWrapper {
+  position: relative;
+}
+
+.dateButtonText {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  font-family: var(--font-general-grotesque), sans-serif;
+  cursor: pointer;
+  padding: 0;
+
+  span {
+    color: white;
+  }
+
+  .date {
+    color: var(--text-muted);
+  }
+
+  svg:last-child {
+    transition: transform 0.25s ease;
+  }
+}
+
+.rotate {
+  transform: rotate(180deg);
+}
+
+.lastUpdated {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-size: 14px;
+  font-family: var(--font-general-grotesque), sans-serif;
 }
 
 .statsGrid {
@@ -28,7 +81,11 @@
 
 .heading {
   color: var(--wheat);
-  padding: 5px;
+  font-size: 24px;
+  font-weight: 400;
+  font-family: var(--font-general-grotesque);
+  letter-spacing: 1.4;
+  margin-bottom: 20px;
 }
 
 .loading {

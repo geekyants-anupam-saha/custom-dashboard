@@ -31,16 +31,31 @@
   gap: 20px;
 }
 
-.dateButton {
-  width: 200px;
-  height: 24px;
+.controlsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  margin-bottom: 28px;
+}
+
+.dateText {
+  width: 240px;
+  height: 20px;
   border-radius: 999px;
 }
 
-.divider {
-  width: 1px;
+.lastUpdatedText {
+  width: 160px;
+  height: 20px;
+  border-radius: 999px;
+}
+
+.heading {
+  width: 150px;
   height: 28px;
-  background: var(--border);
+  border-radius: 999px;
+  margin-bottom: 24px;
 }
 
 .logoutButton {
@@ -58,36 +73,42 @@
 
 .statCard {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 140px;
 
   padding: 24px;
 
   border-radius: 20px;
 
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--white-5);
+}
+
+.iconWrapper {
+  display: flex;
 }
 
 .icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
 }
 
 .statContent {
-  flex: 1;
-}
-
-.smallLine {
-  width: 90px;
-  height: 12px;
-  margin-bottom: 12px;
-  border-radius: 999px;
+  display: flex;
+  flex-direction: column;
 }
 
 .bigLine {
-  width: 120px;
-  height: 28px;
+  width: 80px;
+  height: 32px;
+  margin-bottom: 8px;
+  border-radius: 999px;
+}
+
+.smallLine {
+  width: 60px;
+  height: 14px;
   border-radius: 999px;
 }
 
@@ -98,46 +119,50 @@
 }
 
 .highlightCard {
-  overflow: hidden;
-
   border-radius: 24px;
-
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.image {
-  width: 100%;
-  height: 260px;
+  padding: 20px;
+  height: fit-content;
+  background: linear-gradient(
+    90deg,
+    var(--white-6) 25%,
+    var(--white-12) 50%,
+    var(--white-6) 75%
+  );
 }
 
 .content {
-  padding: 24px;
+  display: flex;
+  gap: 20px;
+}
+
+.image {
+  flex: 1;
+  height: 180px;
+  border-radius: 16px;
+}
+
+.details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.userLine {
+  width: 120px;
+  height: 20px;
+  border-radius: 999px;
 }
 
 .title {
-  width: 180px;
-  height: 20px;
-
-  margin-bottom: 18px;
-
+  width: 80%;
+  height: 24px;
   border-radius: 999px;
 }
 
-.text {
-  width: 100%;
-  height: 12px;
-
-  margin-bottom: 10px;
-
-  border-radius: 999px;
-}
-
-.textShort {
-  width: 70%;
-  height: 12px;
-
-  margin-bottom: 26px;
-
+.button {
+  width: 90px;
+  height: 36px;
   border-radius: 999px;
 }
 
@@ -153,21 +178,23 @@
 }
 
 .logo,
-.dateButton,
+.dateText,
+.lastUpdatedText,
 .logoutButton,
+.heading,
 .icon,
 .smallLine,
 .bigLine,
 .image,
+.userLine,
 .title,
-.text,
-.textShort,
+.button,
 .stat {
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.06) 25%,
-    rgba(255, 255, 255, 0.12) 50%,
-    rgba(255, 255, 255, 0.06) 75%
+    var(--white-6) 25%,
+    var(--white-12) 50%,
+    var(--white-6) 75%
   );
 
   background-size: 200% 100%;
@@ -201,7 +228,10 @@
     padding: 0 20px;
   }
 
-  .dateButton {
-    width: 120px;
+  .dateText {
+    width: 160px;
+  }
+  .lastUpdatedText {
+    display: none;
   }
 }

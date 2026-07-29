@@ -24,15 +24,3 @@ model OtpVerification {
 
   @@map("otp_verifications")
 }
-
-model FacebookAccount {
-  id                        String   @id @default(cuid())
-  pageId                    String   @unique
-  name                      String
-  pageAccessToken           String
-  instagramBusinessAccountId String
-  createdAt                 DateTime @default(now())
-  updatedAt                 DateTime @updatedAt
-
-  @@map("facebook_accounts")
-}
