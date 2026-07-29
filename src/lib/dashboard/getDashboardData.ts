@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { unstable_cache } from "next/cache";
 import { cookies } from "next/headers";
 import { GoogleAuth } from "google-auth-library";

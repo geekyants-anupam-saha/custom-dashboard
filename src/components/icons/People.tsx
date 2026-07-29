@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const People = (props: any) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"

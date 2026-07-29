@@ -77,7 +77,7 @@ export default function HomePage() {
       <p className={styles.signInHeading}>Sign in</p>
 
       <p className={styles.subtitle}>
-        Enter your email and we'll send you a one-time code.
+        Enter your email and we&apos;ll send you a one-time code.
       </p>
 
       <form onSubmit={handleSendOtp} className={styles.form}>

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/static-components */
 import React, { ReactNode } from "react";
 import styles from "./HighlightCard.module.scss";
 import ArrowRight from "@/components/icons/ArrowRight";

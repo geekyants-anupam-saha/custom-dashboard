@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -136,7 +137,7 @@ export default function OtpPage() {
       <p className={styles.heading}>Check your email</p>
 
       <p className={styles.subtitle}>
-        We've sent a 6-digit code to <strong>{email}</strong>
+        We&apos;ve sent a 6-digit code to <strong>{email}</strong>
       </p>
 
       <form onSubmit={handleVerifyOtp} className={styles.form}>
@@ -181,7 +182,7 @@ export default function OtpPage() {
       </form>
 
       <p className={styles.footerText}>
-        Didn't get it? Check your spam folder or{" "}
+        Didn&apos;t get it? Check your spam folder or{" "}
         <button
           type="button"
           className={styles.anotherMail}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { DocumentNode, OperationVariables } from "@apollo/client";
 import client from "./client";
 

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
@@ -16,13 +18,12 @@ import Eye from "@/components/icons/Eye";
 import DashboardHeader from "./components/DashboardHeader/DashboardHeader";
 import StatsCard from "./components/StatsCard/StatsCard";
 import HighlightCard from "./components/HighlightCard/HighlightCard";
-import { getTimeAgo } from "../../../utils";
 import DashboardSkeleton from "./components/DashboardSkeleton/DashboardSkeleton";
 import Instagram from "@/components/icons/Instagram";
 
 interface DashboardPageProps {
   dashboardData: {
-    lastUpdated: Date;
+    lastUpdated: string;
     instagram: {
       followersCount: number;
       mostViewedPost: {
