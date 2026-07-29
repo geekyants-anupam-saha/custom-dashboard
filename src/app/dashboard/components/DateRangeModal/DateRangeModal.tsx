@@ -26,7 +26,7 @@ export default function DateRangeModal({
 
   const ranges = getPresetRanges();
 
-  const selectedRange = searchParams.get("range") ?? "lastYear";
+  const selectedRange = searchParams.get("range") ?? "lastMonth";
 
   const [view, setView] = useState<"list" | "custom">("list");
   const [customStart, setCustomStart] = useState("");
