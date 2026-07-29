@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import ArrowLeft from "@/components/icons/ArrowLeft";
 import styles from "./DateRangeModal.module.scss";
 import { DateRangeOption, getPresetRanges } from "./dateRanges";
 
@@ -49,21 +49,13 @@ export default function DateRangeModal({
   };
 
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-        onClose();
-      }
-    }
-
     if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
       setView(selectedRange === "custom" ? "custom" : "list");
       setCustomStart(toYYYYMMDD(currentStartIso));
       setCustomEnd(toYYYYMMDD(currentEndIso));
     }
-
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [open, onClose, currentStartIso, currentEndIso]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   if (!open) return null;
 
@@ -93,8 +85,8 @@ export default function DateRangeModal({
     onSelect?.();
     const params = new URLSearchParams(searchParams.toString());
     params.set("range", "custom");
-    params.set("startDate", new Date(customStart).toISOString());
-    params.set("endDate", new Date(customEnd).toISOString());
+    params.set("startDate", new Date(customStart + "T00:00:00").toISOString());
+    params.set("endDate", new Date(customEnd + "T23:59:59").toISOString());
 
     router.replace(`${pathname}?${params.toString()}`, {
       scroll: false,
@@ -105,7 +97,7 @@ export default function DateRangeModal({
 
   return (
     <>
-      <div className={styles.backdrop} />
+      <div className={styles.backdrop} onClick={onClose} />
 
       <div ref={modalRef} className={styles.modal}>
         {view === "list" ? (

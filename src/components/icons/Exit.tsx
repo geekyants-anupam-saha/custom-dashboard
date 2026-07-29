@@ -1,4 +1,4 @@
-const Login = (props: any) => (
+const Exit = (props: any) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="25"
@@ -13,4 +13,4 @@ const Login = (props: any) => (
   </svg>
 );
 
-export default Login;
+export default Exit;

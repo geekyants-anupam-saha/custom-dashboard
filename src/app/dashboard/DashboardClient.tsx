@@ -1,26 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Bookmark,
-  Clock3,
-  Eye,
-  Gamepad2,
-  Sprout,
-  UsersRound,
-} from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState, useEffect } from "react";
+import { CalendarDays, ChevronDown, Bookmark, RotateCcw } from "lucide-react";
+
+import DateRangeModal from "./components/DateRangeModal/DateRangeModal";
+import { getRangeByKey } from "./components/DateRangeModal/dateRanges";
 
 import styles from "./page.module.scss";
-
-import DashboardHeader from "./components/DashboardHeader";
-import StatsCard from "./components/StatsCard";
-import HighlightCard from "./components/HighlightCard";
+import Plant from "@/components/icons/Plant";
+import Game from "@/components/icons/Game";
+import People from "@/components/icons/People";
+import Clock from "@/components/icons/Clock";
+import Eye from "@/components/icons/Eye";
+import DashboardHeader from "./components/DashboardHeader/DashboardHeader";
+import StatsCard from "./components/StatsCard/StatsCard";
+import HighlightCard from "./components/HighlightCard/HighlightCard";
 import { getTimeAgo } from "../../../utils";
-import DashboardSkeleton from "./components/DashboardSkeleton";
+import DashboardSkeleton from "./components/DashboardSkeleton/DashboardSkeleton";
+import Instagram from "@/components/icons/Instagram";
 
 interface DashboardPageProps {
   dashboardData: {
+    lastUpdated: Date;
     instagram: {
       followersCount: number;
       mostViewedPost: {
@@ -46,6 +48,8 @@ export default function DashboardPage({
   dashboardData: initialDashboardData,
 }: DashboardPageProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [open, setOpen] = useState(false);
   const dashboardData = initialDashboardData;
   const mostViewedArticle = dashboardData.mostViewedArticle;
   const [loading, setLoading] = useState(false);
@@ -53,6 +57,27 @@ export default function DashboardPage({
   useEffect(() => {
     setLoading(false);
   }, [dashboardData]);
+
+  const selectedRange = useMemo(() => {
+    const range = searchParams.get("range");
+    return getRangeByKey(range ?? "lastYear");
+  }, [searchParams]);
+
+  const customStart = searchParams.get("startDate");
+  const customEnd = searchParams.get("endDate");
+
+  const displayDate =
+    customStart && customEnd
+      ? `${new Date(customStart).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })} - ${new Date(customEnd).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })}`
+      : selectedRange.displayRange;
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", {
@@ -63,102 +88,141 @@ export default function DashboardPage({
     router.refresh();
   };
   const averageSessionDuration = mostViewedArticle?.averageSessionDuration ?? 0;
+  const formattedLastUpdated = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(dashboardData.lastUpdated));
 
   if (loading) {
     return <DashboardSkeleton />;
   }
   return (
-    <div>
-      <DashboardHeader
-        onLogout={handleLogout}
-        onDateSelect={() => setLoading(true)}
-      />
+    <div className={styles.pageWrapper}>
+      <DashboardHeader onLogout={handleLogout} />
       <div className={styles.container}>
+        <div className={styles.controlsRow}>
+          <div className={styles.dateWrapper}>
+            <button
+              className={styles.dateButtonText}
+              onClick={() => setOpen((prev) => !prev)}
+            >
+              <CalendarDays color="var(--text-muted)" size={16} />
+              <span>{selectedRange.label}</span>
+              <span className={styles.date}>{displayDate}</span>
+              <ChevronDown
+                color="var(--text-muted)"
+                size={14}
+                className={open ? styles.rotate : ""}
+              />
+            </button>
+            <DateRangeModal
+              open={open}
+              onClose={() => setOpen(false)}
+              onSelect={() => setLoading(true)}
+            />
+          </div>
+
+          <div className={styles.lastUpdated}>
+            <RotateCcw color="var(--text-muted)" size={14} />
+            <span>Last Updated: {formattedLastUpdated}</span>
+          </div>
+        </div>
+
         <div>
           <h1 className={styles.heading}>Overview</h1>
           <div className={styles.statsGrid}>
             <StatsCard
               title="Seeds Planted"
               value={dashboardData.game.seedPlanted.count}
-              icon={<Sprout />}
+              icon={<Plant />}
+              tooltip="This is all time data"
             />
 
             <StatsCard
               title="Web Playthroughs"
               value={dashboardData.game.webPlaythroughs ?? 0}
-              icon={<Gamepad2 />}
+              icon={<Game />}
             />
 
             <StatsCard
               title="Follower Count"
               value={dashboardData.instagram.followersCount}
-              icon={<UsersRound />}
+              icon={<People />}
+              tooltip="This is all time data"
             />
           </div>
         </div>
         <div>
-          {(dashboardData.instagram.mostViewedPost || mostViewedArticle) && (
+          {(dashboardData.instagram.mostViewedPost ||
+            mostViewedArticle ||
+            true) && (
             <h1 className={styles.heading}>What moved the audience</h1>
           )}
           <div className={styles.highlightGrid}>
-            {dashboardData.instagram.mostViewedPost && (
-              <HighlightCard
-                title="Most Viewed Post"
-                image={dashboardData.instagram.mostViewedPost.image}
-                avatar="/instagram.avif"
-                username="@worldofus"
-                buttonText="View Post"
-                subText={getTimeAgo(
-                  dashboardData.instagram.mostViewedPost.timestamp,
-                )}
-                postLink={dashboardData.instagram.mostViewedPost.permalink}
-                stats={[
-                  {
-                    icon: <Eye size={18} />,
-                    value: dashboardData.instagram.mostViewedPost.views,
-                    label: "VIEWS",
-                  },
-                  {
-                    icon: <Bookmark size={18} />,
-                    value: dashboardData.instagram.mostViewedPost.totalSaves,
-                    label: "SAVES",
-                  },
-                ]}
-              />
-            )}
+            <HighlightCard
+              title="Most Viewed Post"
+              isEmpty={!dashboardData.instagram.mostViewedPost}
+              emptyMessage="No posts available for the selected time period."
+              image={dashboardData.instagram.mostViewedPost?.image}
+              avatar={<Instagram />}
+              username="@worldofus"
+              buttonText="See Post"
+              postLink={dashboardData.instagram.mostViewedPost?.permalink}
+              stats={
+                dashboardData.instagram.mostViewedPost
+                  ? [
+                      {
+                        icon: <Eye size={18} />,
+                        value: dashboardData.instagram.mostViewedPost.views,
+                        label: "VIEWS",
+                      },
+                      {
+                        icon: <Bookmark size={18} color="#E3F24F" />,
+                        value:
+                          dashboardData.instagram.mostViewedPost.totalSaves,
+                        label: "SAVES",
+                      },
+                    ]
+                  : []
+              }
+            />
 
-            {mostViewedArticle && (
-              <HighlightCard
-                title="Most Read Article"
-                image={
-                  mostViewedArticle.attributes.CoverImg?.data?.attributes?.url
-                }
-                heading={mostViewedArticle.attributes.Title}
-                buttonText="Read Article"
-                description={
-                  mostViewedArticle.attributes.ShortDes?.replace(
-                    /<[^>]*>/g,
-                    "",
-                  ) ?? ""
-                }
-                postLink={`${process.env.NEXT_PUBLIC_URL}${mostViewedArticle.pagePath}`}
-                stats={[
-                  {
-                    icon: <Eye size={18} />,
-                    value: mostViewedArticle.pageViews,
-                    label: "VIEWS",
-                  },
-                  {
-                    icon: <Clock3 size={18} />,
-                    value:
-                      averageSessionDuration >= 60
-                        ? `${Math.floor(averageSessionDuration / 60)} MINS`
-                        : `${Math.round(averageSessionDuration)} SEC`,
-                    label: "AVG TIME",
-                  },
-                ]}
-              />
-            )}
+            <HighlightCard
+              title="Most Read Article"
+              isEmpty={!mostViewedArticle}
+              emptyMessage="No articles available for the selected time period."
+              image={
+                mostViewedArticle?.attributes?.CoverImg?.data?.attributes?.url
+              }
+              heading={mostViewedArticle?.attributes?.Title}
+              buttonText="See Article"
+              postLink={
+                mostViewedArticle
+                  ? `${process.env.NEXT_PUBLIC_URL}${mostViewedArticle.pagePath}`
+                  : undefined
+              }
+              stats={
+                mostViewedArticle
+                  ? [
+                      {
+                        icon: <Eye />,
+                        value: mostViewedArticle.pageViews,
+                        label: "VIEWS",
+                      },
+                      {
+                        icon: <Clock color="#E3F24F" />,
+                        value:
+                          averageSessionDuration >= 60
+                            ? `${Math.floor(averageSessionDuration / 60)} MINS`
+                            : `${Math.round(averageSessionDuration)} SEC`,
+                        label: "AVG TIME",
+                      },
+                    ]
+                  : []
+              }
+            />
           </div>
         </div>
       </div>

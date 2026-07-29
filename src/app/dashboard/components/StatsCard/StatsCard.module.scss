@@ -1,12 +1,14 @@
 .card {
   background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: 28px;
-  min-height: 220px;
+  border-radius: 24px;
+  padding: 26px;
+  width: 400px;
+  height: 130px;
 
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  flex-direction: row;
+  gap: 24px;
+  align-items: center;
 
   box-shadow: var(--shadow);
 }
@@ -18,10 +20,11 @@
 }
 
 .iconWrapper {
-  width: 56px;
-  height: 56px;
+  width: 53px;
+  height: 53px;
 
-  border-radius: 16px;
+  border-radius: 8;
+  border: 0.1px solid white;
 
   background: var(--border);
 
@@ -39,8 +42,6 @@
 }
 
 .badge {
-  padding: 8px 14px;
-
   border-radius: 999px;
 
   font-size: 14px;
@@ -60,21 +61,41 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 5px;
+
+  .titleWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
   h3 {
-    color: var(--secondary);
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 400;
+    font-style: italic;
+    font-family: var(--font-general-grotesque);
+    margin: 0;
+  }
+
+  .infoIcon {
+    color: var(--text-muted);
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    
+    &:hover {
+      opacity: 1;
+    }
   }
 
   h2 {
-    color: var(--primary);
-    font-size: 64px;
+    color: var(--text-muted);
+    font-size: 60px;
     font-weight: 700;
-    line-height: 1;
-    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-family: var(--font-ivory-ll), serif;
   }
 }
