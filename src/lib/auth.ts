@@ -11,12 +11,18 @@ const secret = new TextEncoder().encode(
   process.env.JWT_SECRET ?? "local-dev-secret",
 );
 
-const ALLOWED_EMAIL_DOMAIN = process.env.ALLOWED_EMAIL_DOMAIN!;
+const envDomains = process.env.NEXT_PUBLIC_ALLOWED_DOMAINS || "";
+const ALLOWED_EMAIL_DOMAINS = envDomains
+  .replace(/^\[|\]$/g, "")
+  .split(",")
+  .map((d) => d.trim())
+  .filter(Boolean);
 
 export function isValidEmail(email: string) {
-  const escapedDomain = ALLOWED_EMAIL_DOMAIN.replace(".", "\\.");
-
-  return new RegExp(`^[A-Za-z0-9._%+-]+@${escapedDomain}$`, "i").test(email);
+  return ALLOWED_EMAIL_DOMAINS.some((domain) => {
+    const escapedDomain = domain.replace(/\./g, "\\.");
+    return new RegExp(`^[A-Za-z0-9._%+-]+@${escapedDomain}$`, "i").test(email);
+  });
 }
 
 export function generateOtp() {

@@ -61,7 +61,7 @@ export default function DashboardPage({
 
   const selectedRange = useMemo(() => {
     const range = searchParams.get("range");
-    return getRangeByKey(range ?? "lastYear");
+    return getRangeByKey(range ?? "lastMonth");
   }, [searchParams]);
 
   const customStart = searchParams.get("startDate");

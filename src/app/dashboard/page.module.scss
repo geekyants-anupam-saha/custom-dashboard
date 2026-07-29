@@ -108,3 +108,11 @@
     padding: 24px;
   }
 }
+
+@media (max-width: 768px) {
+  .controlsRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
