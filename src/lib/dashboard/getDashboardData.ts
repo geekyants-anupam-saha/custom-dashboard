@@ -314,6 +314,7 @@ async function fetchDashboardData(range: DashboardDateRange) {
     }
 
     return {
+      lastUpdated: new Date().toISOString(),
       instagram,
       game: {
         seedPlanted,

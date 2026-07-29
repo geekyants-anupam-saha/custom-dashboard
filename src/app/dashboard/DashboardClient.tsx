@@ -22,6 +22,7 @@ import Instagram from "@/components/icons/Instagram";
 
 interface DashboardPageProps {
   dashboardData: {
+    lastUpdated: Date;
     instagram: {
       followersCount: number;
       mostViewedPost: {
@@ -87,6 +88,12 @@ export default function DashboardPage({
     router.refresh();
   };
   const averageSessionDuration = mostViewedArticle?.averageSessionDuration ?? 0;
+  const formattedLastUpdated = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(dashboardData.lastUpdated));
 
   if (loading) {
     return <DashboardSkeleton />;
@@ -119,7 +126,7 @@ export default function DashboardPage({
 
           <div className={styles.lastUpdated}>
             <RotateCcw color="var(--text-muted)" size={14} />
-            <span>Last Updated: Jul 26, 2026</span>
+            <span>Last Updated: {formattedLastUpdated}</span>
           </div>
         </div>
 
@@ -148,7 +155,9 @@ export default function DashboardPage({
           </div>
         </div>
         <div>
-          {(dashboardData.instagram.mostViewedPost || mostViewedArticle || true) && (
+          {(dashboardData.instagram.mostViewedPost ||
+            mostViewedArticle ||
+            true) && (
             <h1 className={styles.heading}>What moved the audience</h1>
           )}
           <div className={styles.highlightGrid}>
@@ -161,43 +170,58 @@ export default function DashboardPage({
               username="@worldofus"
               buttonText="See Post"
               postLink={dashboardData.instagram.mostViewedPost?.permalink}
-              stats={dashboardData.instagram.mostViewedPost ? [
-                {
-                  icon: <Eye size={18} />,
-                  value: dashboardData.instagram.mostViewedPost.views,
-                  label: "VIEWS",
-                },
-                {
-                  icon: <Bookmark size={18} color="#E3F24F" />,
-                  value: dashboardData.instagram.mostViewedPost.totalSaves,
-                  label: "SAVES",
-                },
-              ] : []}
+              stats={
+                dashboardData.instagram.mostViewedPost
+                  ? [
+                      {
+                        icon: <Eye size={18} />,
+                        value: dashboardData.instagram.mostViewedPost.views,
+                        label: "VIEWS",
+                      },
+                      {
+                        icon: <Bookmark size={18} color="#E3F24F" />,
+                        value:
+                          dashboardData.instagram.mostViewedPost.totalSaves,
+                        label: "SAVES",
+                      },
+                    ]
+                  : []
+              }
             />
 
             <HighlightCard
               title="Most Read Article"
               isEmpty={!mostViewedArticle}
               emptyMessage="No articles available for the selected time period."
-              image={mostViewedArticle?.attributes?.CoverImg?.data?.attributes?.url}
+              image={
+                mostViewedArticle?.attributes?.CoverImg?.data?.attributes?.url
+              }
               heading={mostViewedArticle?.attributes?.Title}
               buttonText="See Article"
-              postLink={mostViewedArticle ? `${process.env.NEXT_PUBLIC_URL}${mostViewedArticle.pagePath}` : undefined}
-              stats={mostViewedArticle ? [
-                {
-                  icon: <Eye />,
-                  value: mostViewedArticle.pageViews,
-                  label: "VIEWS",
-                },
-                {
-                  icon: <Clock color="#E3F24F" />,
-                  value:
-                    averageSessionDuration >= 60
-                      ? `${Math.floor(averageSessionDuration / 60)} MINS`
-                      : `${Math.round(averageSessionDuration)} SEC`,
-                  label: "AVG TIME",
-                },
-              ] : []}
+              postLink={
+                mostViewedArticle
+                  ? `${process.env.NEXT_PUBLIC_URL}${mostViewedArticle.pagePath}`
+                  : undefined
+              }
+              stats={
+                mostViewedArticle
+                  ? [
+                      {
+                        icon: <Eye />,
+                        value: mostViewedArticle.pageViews,
+                        label: "VIEWS",
+                      },
+                      {
+                        icon: <Clock color="#E3F24F" />,
+                        value:
+                          averageSessionDuration >= 60
+                            ? `${Math.floor(averageSessionDuration / 60)} MINS`
+                            : `${Math.round(averageSessionDuration)} SEC`,
+                        label: "AVG TIME",
+                      },
+                    ]
+                  : []
+              }
             />
           </div>
         </div>
