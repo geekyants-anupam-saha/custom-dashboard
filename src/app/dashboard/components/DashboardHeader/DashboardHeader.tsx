@@ -1,16 +1,27 @@
 "use client";
 import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import styles from "./DashboardHeader.module.scss";
 import Logo from "@/components/icons/Logo";
 import Exit from "@/components/icons/Exit";
 import LogoutModal from "../LogoutModal/LogoutModal";
 
-interface DashboardHeaderProps {
-  onLogout: () => void;
-}
-
-export default function DashboardHeader({ onLogout }: DashboardHeaderProps) {
+export default function DashboardHeader() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  if (pathname === "/" || pathname === "/verify-otp") {
+    return null;
+  }
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", {
+      method: "POST",
+    });
+    router.replace("/");
+    router.refresh();
+  };
 
   return (
     <div className={styles.header}>
@@ -31,7 +42,7 @@ export default function DashboardHeader({ onLogout }: DashboardHeaderProps) {
       {showLogoutModal && (
         <LogoutModal
           onClose={() => setShowLogoutModal(false)}
-          onLogout={onLogout}
+          onLogout={handleLogout}
         />
       )}
     </div>

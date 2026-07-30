@@ -2,6 +2,8 @@
 import React, { ReactNode } from "react";
 import styles from "./HighlightCard.module.scss";
 import ArrowRight from "@/components/icons/ArrowRight";
+import Info from "@/components/icons/Info";
+import DashedBorder from "@/components/icons/DashedBorder";
 
 interface StatItem {
   icon: ReactNode;
@@ -24,7 +26,7 @@ interface HighlightCardProps {
 
   stats?: StatItem[];
   isEmpty?: boolean;
-  emptyMessage?: string;
+  emptyMessage?: ReactNode;
 }
 
 export default function HighlightCard({
@@ -47,6 +49,10 @@ export default function HighlightCard({
       <div className={styles.content}>
         {isEmpty ? (
           <div className={styles.emptyState}>
+            <DashedBorder className={styles.dashedBorder} />
+            <div className={styles.iconWrapper}>
+              <Info />
+            </div>
             <p>{emptyMessage}</p>
           </div>
         ) : (
