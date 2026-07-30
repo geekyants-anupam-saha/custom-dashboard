@@ -1,39 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyJwt } from "@/lib/auth";
 
+const PUBLIC_ROUTES = ["/", "/verify-otp"];
+
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
   const token = request.cookies.get("auth-token")?.value;
-  const pathname = request.nextUrl.pathname;
 
-  if (pathname === "/") {
-    if (!token) {
-      return NextResponse.next();
-    }
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+  const user = token ? await verifyJwt(token) : null;
 
-    const user = await verifyJwt(token);
-
-    if (user) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
-    return NextResponse.next();
+  if (!user && !isPublicRoute) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (pathname.startsWith("/dashboard")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-
-    const user = await verifyJwt(token);
-
-    if (!user) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+  if (user && isPublicRoute) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/dashboard/:path*"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };
