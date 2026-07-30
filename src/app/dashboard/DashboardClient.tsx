@@ -15,7 +15,6 @@ import Game from "@/components/icons/Game";
 import People from "@/components/icons/People";
 import Clock from "@/components/icons/Clock";
 import Eye from "@/components/icons/Eye";
-import DashboardHeader from "./components/DashboardHeader/DashboardHeader";
 import StatsCard from "./components/StatsCard/StatsCard";
 import HighlightCard from "./components/HighlightCard/HighlightCard";
 import DashboardSkeleton from "./components/DashboardSkeleton/DashboardSkeleton";
@@ -80,14 +79,6 @@ export default function DashboardPage({
         })}`
       : selectedRange.displayRange;
 
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", {
-      method: "POST",
-    });
-
-    router.replace("/");
-    router.refresh();
-  };
   const averageSessionDuration = mostViewedArticle?.averageSessionDuration ?? 0;
   const formattedLastUpdated = new Intl.DateTimeFormat("en-US", {
     month: "short",
@@ -101,7 +92,6 @@ export default function DashboardPage({
   }
   return (
     <div className={styles.pageWrapper}>
-      <DashboardHeader onLogout={handleLogout} />
       <div className={styles.container}>
         <div className={styles.controlsRow}>
           <div className={styles.dateWrapper}>
@@ -165,7 +155,7 @@ export default function DashboardPage({
             <HighlightCard
               title="Most Viewed Post"
               isEmpty={!dashboardData.instagram.mostViewedPost}
-              emptyMessage="No posts available for the selected time period."
+              emptyMessage="We couldn't find any data for the selected date range. Please try adjusting the dates or check back later!"
               image={dashboardData.instagram.mostViewedPost?.image}
               avatar={<Instagram />}
               username="@worldofus"
@@ -193,7 +183,7 @@ export default function DashboardPage({
             <HighlightCard
               title="Most Read Article"
               isEmpty={!mostViewedArticle}
-              emptyMessage="No articles available for the selected time period."
+              emptyMessage="We couldn't find any article for the selected date range. Please try adjusting the dates or check back later!"
               image={
                 mostViewedArticle?.attributes?.CoverImg?.data?.attributes?.url
               }
