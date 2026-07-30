@@ -4,7 +4,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
-import { CalendarDays, ChevronDown, Bookmark, RotateCcw } from "lucide-react";
+import { CalendarDays, ChevronDown, Bookmark } from "lucide-react";
 
 import DateRangeModal from "./components/DateRangeModal/DateRangeModal";
 import { getRangeByKey } from "./components/DateRangeModal/dateRanges";
@@ -15,6 +15,7 @@ import Game from "@/components/icons/Game";
 import People from "@/components/icons/People";
 import Clock from "@/components/icons/Clock";
 import Eye from "@/components/icons/Eye";
+import Rotate from "@/components/icons/Rotate";
 import StatsCard from "./components/StatsCard/StatsCard";
 import HighlightCard from "./components/HighlightCard/HighlightCard";
 import DashboardSkeleton from "./components/DashboardSkeleton/DashboardSkeleton";
@@ -118,10 +119,10 @@ export default function DashboardPage({
           </div>
 
           <div className={styles.lastUpdated}>
-            <RotateCcw
+            <Rotate
               key={dashboardData.lastUpdated}
               color="var(--text-muted)"
-              size={14}
+              size={18}
               className={styles.spin}
             />
             <span>Last Updated: {formattedLastUpdated}</span>
