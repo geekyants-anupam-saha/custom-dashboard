@@ -85,9 +85,6 @@ export default function DashboardPage({
     month: "short",
     day: "numeric",
     year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
   }).format(new Date(dashboardData.lastUpdated));
 
   if (loading) {
@@ -104,7 +101,9 @@ export default function DashboardPage({
             >
               <CalendarDays color="var(--text-muted)" size={16} />
               <span>{selectedRange.label}</span>
-              <span className={styles.date} suppressHydrationWarning>{displayDate}</span>
+              <span className={styles.date} suppressHydrationWarning>
+                {displayDate}
+              </span>
               <ChevronDown
                 color="var(--text-muted)"
                 size={14}
@@ -125,7 +124,12 @@ export default function DashboardPage({
               size={18}
               className={styles.spin}
             />
-            <span suppressHydrationWarning>Last Updated: {formattedLastUpdated}</span>
+            <span>
+              Last Updated:{" "}
+              <span suppressHydrationWarning className={styles.lastUpdatedText}>
+                {formattedLastUpdated}
+              </span>
+            </span>
           </div>
         </div>
 
