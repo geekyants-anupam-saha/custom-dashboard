@@ -39,101 +39,88 @@ function isWithinDateRange(
   );
 }
 
-const getInstagramDataCached = unstable_cache(
-  async (range: DashboardDateRange) => {
-    try {
-      const accountRes = await fetch(
-        `https://graph.facebook.com/v23.0/${INSTAGRAM_ACCOUNT_ID}?fields=followers_count&access_token=${FB_PAGE_ACCESS_TOKEN}`,
-      );
+async function getInstagramData(range: DashboardDateRange) {
+  try {
+    const accountRes = await fetch(
+      `https://graph.facebook.com/v23.0/${INSTAGRAM_ACCOUNT_ID}?fields=followers_count&access_token=${FB_PAGE_ACCESS_TOKEN}`,
+    );
 
-      if (!accountRes.ok) {
-        throw new Error(`Instagram account API failed: ${accountRes.status}`);
-      }
+    if (!accountRes.ok) {
+      throw new Error(`Instagram account API failed: ${accountRes.status}`);
+    }
 
-      const account = await accountRes.json();
+    const account = await accountRes.json();
 
-      const allPosts: any[] = [];
-      let nextUrl: string | null =
-        `https://graph.facebook.com/v23.0/${INSTAGRAM_ACCOUNT_ID}/media?fields=id,caption,media_url,thumbnail_url,media_type,permalink,timestamp,like_count,comments_count,insights.metric(views,saved)&limit=100&access_token=${FB_PAGE_ACCESS_TOKEN}`;
+    const allPosts: any[] = [];
+    let nextUrl: string | null =
+      `https://graph.facebook.com/v23.0/${INSTAGRAM_ACCOUNT_ID}/media?fields=id,caption,media_url,thumbnail_url,media_type,permalink,timestamp,like_count,comments_count,insights.metric(views,saved)&limit=100&access_token=${FB_PAGE_ACCESS_TOKEN}`;
 
-      const rangeStartTime = new Date(range.startDate).getTime();
+    const rangeStartTime = new Date(range.startDate).getTime();
 
-      while (nextUrl) {
-        try {
-          const res: any = await fetch(nextUrl);
-          if (!res.ok) {
-            console.error(`Instagram media API failed: ${res.status}`);
-            break;
-          }
-          const data = await res.json();
-          const fetchedPosts = data.data ?? [];
-          allPosts.push(...fetchedPosts);
-
-          if (fetchedPosts.length > 0) {
-            const oldestPostInBatch = fetchedPosts[fetchedPosts.length - 1];
-            if (
-              new Date(oldestPostInBatch.timestamp).getTime() < rangeStartTime
-            ) {
-              break;
-            }
-          }
-
-          nextUrl = data.paging?.next ?? null;
-        } catch (pageErr) {
-          console.error("Instagram pagination error:", pageErr);
+    while (nextUrl) {
+      try {
+        const res: any = await fetch(nextUrl);
+        if (!res.ok) {
+          console.error(`Instagram media API failed: ${res.status}`);
           break;
         }
+        const data = await res.json();
+        const fetchedPosts = data.data ?? [];
+        allPosts.push(...fetchedPosts);
+
+        if (fetchedPosts.length > 0) {
+          const oldestPostInBatch = fetchedPosts[fetchedPosts.length - 1];
+          if (
+            new Date(oldestPostInBatch.timestamp).getTime() < rangeStartTime
+          ) {
+            break;
+          }
+        }
+
+        nextUrl = data.paging?.next ?? null;
+      } catch (pageErr) {
+        console.error("Instagram pagination error:", pageErr);
+        break;
       }
-
-      const filteredPosts = allPosts.filter((post) =>
-        isWithinDateRange(post.timestamp, range),
-      );
-
-      const posts = filteredPosts.map((item: any) => ({
-        id: item.id,
-        caption: item.caption,
-        mediaUrl: item.media_url,
-        thumbnailUrl: item.thumbnail_url,
-        image:
-          item.media_type === "VIDEO" ? item.thumbnail_url : item.media_url,
-        mediaType: item.media_type,
-        permalink: item.permalink,
-        timestamp: item.timestamp,
-        likes: item.like_count ?? 0,
-        comments: item.comments_count ?? 0,
-        views:
-          item.insights?.data?.find((metric: any) => metric.name === "views")
-            ?.values?.[0]?.value ?? 0,
-        totalSaves:
-          item.insights?.data?.find((metric: any) => metric.name === "saved")
-            ?.values?.[0]?.value ?? 0,
-      }));
-
-      const mostViewedPost =
-        posts.length > 0
-          ? posts.reduce((max, post) => (post.views > max.views ? post : max))
-          : null;
-
-      return {
-        followersCount: account.followers_count ?? 0,
-        mostViewedPost,
-      };
-    } catch (err) {
-      throw new Error(
-        `Failed to fetch Instagram data: ${err instanceof Error ? err.message : String(err)}`,
-      );
     }
-  },
-  ["instagram-data-optimized"],
-  { revalidate: revalidateTime },
-);
 
-async function getInstagramData(range: DashboardDateRange) {
-  return unstable_cache(
-    () => getInstagramDataCached(range),
-    ["instagram-data-optimized", range.startDate, range.endDate],
-    { revalidate: revalidateTime },
-  )();
+    const filteredPosts = allPosts.filter((post) =>
+      isWithinDateRange(post.timestamp, range),
+    );
+
+    const posts = filteredPosts.map((item: any) => ({
+      id: item.id,
+      caption: item.caption,
+      mediaUrl: item.media_url,
+      thumbnailUrl: item.thumbnail_url,
+      image: item.media_type === "VIDEO" ? item.thumbnail_url : item.media_url,
+      mediaType: item.media_type,
+      permalink: item.permalink,
+      timestamp: item.timestamp,
+      likes: item.like_count ?? 0,
+      comments: item.comments_count ?? 0,
+      views:
+        item.insights?.data?.find((metric: any) => metric.name === "views")
+          ?.values?.[0]?.value ?? 0,
+      totalSaves:
+        item.insights?.data?.find((metric: any) => metric.name === "saved")
+          ?.values?.[0]?.value ?? 0,
+    }));
+
+    const mostViewedPost =
+      posts.length > 0
+        ? posts.reduce((max, post) => (post.views > max.views ? post : max))
+        : null;
+
+    return {
+      followersCount: account.followers_count ?? 0,
+      mostViewedPost,
+    };
+  } catch (err) {
+    throw new Error(
+      `Failed to fetch Instagram data: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
 }
 
 async function getSeedPlanted() {
@@ -257,23 +244,19 @@ async function getAnalyticsPageVisits(range: DashboardDateRange) {
     );
   }
 }
-const getAllArticlesCached = unstable_cache(
-  async () => {
-    try {
-      return await fetchData(getArticleData, {
-        locale: "en",
-        page: 1,
-        pageSize: 1000,
-      });
-    } catch (err) {
-      throw new Error(
-        `Failed to fetch articles data: ${err instanceof Error ? err.message : String(err)}`,
-      );
-    }
-  },
-  ["all-articles-v2"],
-  { revalidate: revalidateTime },
-);
+async function getAllArticles() {
+  try {
+    return await fetchData(getArticleData, {
+      locale: "en",
+      page: 1,
+      pageSize: 1000,
+    });
+  } catch (err) {
+    throw new Error(
+      `Failed to fetch articles data: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+}
 
 async function fetchDashboardData(range: DashboardDateRange) {
   try {
@@ -282,7 +265,7 @@ async function fetchDashboardData(range: DashboardDateRange) {
         getInstagramData(range),
         getSeedPlanted(),
         getAnalyticsPageVisits(range),
-        getAllArticlesCached(),
+        getAllArticles(),
       ]);
 
     const gamePage = analyticsPageVisits.find(
@@ -340,9 +323,7 @@ export async function getDashboardData(startDate?: string, endDate?: string) {
 
   const actualStartDate =
     startDate ??
-    new Date(
-      new Date().setMonth(new Date().getMonth() - 1),
-    ).toISOString();
+    new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString();
   const actualEndDate = endDate ?? new Date().toISOString();
 
   const cacheKeyStart = actualStartDate.split("T")[0];
@@ -351,8 +332,14 @@ export async function getDashboardData(startDate?: string, endDate?: string) {
   const queryStartDate = `${cacheKeyStart}T00:00:00.000Z`;
   const queryEndDate = `${cacheKeyEnd}T23:59:59.999Z`;
 
-  return fetchDashboardData({
-    startDate: queryStartDate,
-    endDate: queryEndDate,
-  });
+  return unstable_cache(
+    async () => {
+      return fetchDashboardData({
+        startDate: queryStartDate,
+        endDate: queryEndDate,
+      });
+    },
+    ["full-dashboard-data", queryStartDate, queryEndDate],
+    { revalidate: revalidateTime },
+  )();
 }

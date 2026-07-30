@@ -104,7 +104,7 @@ export default function DashboardPage({
             >
               <CalendarDays color="var(--text-muted)" size={16} />
               <span>{selectedRange.label}</span>
-              <span className={styles.date}>{displayDate}</span>
+              <span className={styles.date} suppressHydrationWarning>{displayDate}</span>
               <ChevronDown
                 color="var(--text-muted)"
                 size={14}
@@ -125,7 +125,7 @@ export default function DashboardPage({
               size={18}
               className={styles.spin}
             />
-            <span>Last Updated: {formattedLastUpdated}</span>
+            <span suppressHydrationWarning>Last Updated: {formattedLastUpdated}</span>
           </div>
         </div>
 
