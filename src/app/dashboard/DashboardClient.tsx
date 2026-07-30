@@ -201,7 +201,7 @@ export default function DashboardPage({
               buttonText="See Article"
               postLink={
                 mostViewedArticle
-                  ? `${process.env.NEXT_PUBLIC_URL}${mostViewedArticle.pagePath}`
+                  ? `${process.env.NEXT_PUBLIC_WORLD_OF_US_URL}${mostViewedArticle.pagePath}`
                   : undefined
               }
               stats={

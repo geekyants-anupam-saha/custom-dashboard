@@ -3,9 +3,9 @@ const Logo = (props: any) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="75"
-    height="48"
+    height="39.63"
     fill="none"
-    viewBox="0 0 75 48"
+    viewBox="0 3.5 73 39"
   >
     <path
       fill="#FFF8FF"

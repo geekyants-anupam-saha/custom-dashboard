@@ -15,15 +15,7 @@ export default function DashboardHeader({ onLogout }: DashboardHeaderProps) {
   return (
     <div className={styles.header}>
       <div className={styles.left}>
-        <div
-          style={{
-            width: 160,
-            height: 60,
-            cursor: "pointer",
-          }}
-        >
-          <Logo />
-        </div>
+        <Logo />
       </div>
 
       <div className={styles.right}>
