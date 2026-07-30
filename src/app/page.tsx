@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import styles from "./page.module.scss";
 import AuthLayout from "@/components/layout/AuthLayout";
 import Exit from "@/components/icons/Exit";
@@ -97,13 +98,23 @@ export default function HomePage() {
 
         <p className={styles.terms}>
           By signing in you agree to our{" "}
-          <a href="#" className={styles.anchor}>
+          <Link
+            href={`${process.env.NEXT_PUBLIC_WORLD_OF_US_URL}/terms-and-conditions`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.anchor}
+          >
             Terms of Service
-          </a>{" "}
+          </Link>{" "}
           and{" "}
-          <a href="#" className={styles.anchor}>
+          <Link
+            href={`${process.env.NEXT_PUBLIC_WORLD_OF_US_URL}/privacy-policy`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.anchor}
+          >
             Privacy Policy
-          </a>
+          </Link>
           .
         </p>
 
