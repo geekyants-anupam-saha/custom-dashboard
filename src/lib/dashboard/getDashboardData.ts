@@ -9,7 +9,7 @@ const FB_PAGE_ACCESS_TOKEN = process.env.FB_PAGE_ACCESS_TOKEN!;
 const INSTAGRAM_ACCOUNT_ID = process.env.INSTAGRAM_ACCOUNT_ID!;
 const METRICS_TOKEN = process.env.METRICS_API_TOKEN!;
 
-const revalidateTime = 180;
+const revalidateTime = 60 * 60 * 24;
 
 interface DashboardDateRange {
   startDate: string;
