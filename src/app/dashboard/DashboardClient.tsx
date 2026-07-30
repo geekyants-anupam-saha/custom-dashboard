@@ -89,11 +89,13 @@ export default function DashboardPage({
     router.refresh();
   };
   const averageSessionDuration = mostViewedArticle?.averageSessionDuration ?? 0;
-  const formattedLastUpdated = new Intl.DateTimeFormat("en-US", {
+  const formattedLastUpdated = new Intl.DateTimeFormat(undefined, {
     month: "short",
     day: "numeric",
     year: "numeric",
-    timeZone: "UTC",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
   }).format(new Date(dashboardData.lastUpdated));
 
   if (loading) {
@@ -126,7 +128,12 @@ export default function DashboardPage({
           </div>
 
           <div className={styles.lastUpdated}>
-            <RotateCcw color="var(--text-muted)" size={14} />
+            <RotateCcw
+              key={dashboardData.lastUpdated}
+              color="var(--text-muted)"
+              size={14}
+              className={styles.spin}
+            />
             <span>Last Updated: {formattedLastUpdated}</span>
           </div>
         </div>
