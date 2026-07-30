@@ -30,9 +30,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "OTP expired" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    let user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      user = await prisma.user.create({ data: { email } });
     }
 
     const token = await createJwt({ id: user.id, email: user.email });
