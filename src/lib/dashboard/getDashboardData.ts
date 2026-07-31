@@ -298,7 +298,7 @@ async function fetchDashboardData(range: DashboardDateRange) {
     }
 
     return {
-      lastUpdated: new Date().toISOString(),
+      lastUpdated: new Date(),
       instagram,
       game: {
         seedPlanted,
@@ -313,6 +313,13 @@ async function fetchDashboardData(range: DashboardDateRange) {
   }
 }
 
+function toYYYYMMDD(date: Date) {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 export async function getDashboardData(startDate?: string, endDate?: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("auth-token")?.value;
@@ -321,16 +328,10 @@ export async function getDashboardData(startDate?: string, endDate?: string) {
     throw new Error("Unauthorized");
   }
 
-  const actualStartDate =
+  const queryStartDate =
     startDate ??
-    new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString();
-  const actualEndDate = endDate ?? new Date().toISOString();
-
-  const cacheKeyStart = actualStartDate.split("T")[0];
-  const cacheKeyEnd = actualEndDate.split("T")[0];
-
-  const queryStartDate = `${cacheKeyStart}T00:00:00.000Z`;
-  const queryEndDate = `${cacheKeyEnd}T23:59:59.999Z`;
+    toYYYYMMDD(new Date(new Date().setMonth(new Date().getMonth() - 1)));
+  const queryEndDate = endDate ?? toYYYYMMDD(new Date());
 
   return unstable_cache(
     async () => {

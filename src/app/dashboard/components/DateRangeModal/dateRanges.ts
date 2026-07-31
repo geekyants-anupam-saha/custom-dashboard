@@ -21,8 +21,11 @@ function formatDisplayDate(date: Date) {
   });
 }
 
-function toIso(date: Date) {
-  return date.toISOString();
+function toYYYYMMDD(date: Date) {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 export function getPresetRanges(): DateRangeOption[] {
@@ -44,8 +47,8 @@ export function getPresetRanges(): DateRangeOption[] {
     {
       key: "lastWeek",
       label: "Last Week",
-      startDate: toIso(lastWeekStart),
-      endDate: toIso(today),
+      startDate: toYYYYMMDD(lastWeekStart),
+      endDate: toYYYYMMDD(today),
       displayRange: `${formatDisplayDate(lastWeekStart)} - ${formatDisplayDate(
         today,
       )}`,
@@ -53,8 +56,8 @@ export function getPresetRanges(): DateRangeOption[] {
     {
       key: "lastMonth",
       label: "Last Month",
-      startDate: toIso(lastMonthStart),
-      endDate: toIso(today),
+      startDate: toYYYYMMDD(lastMonthStart),
+      endDate: toYYYYMMDD(today),
       displayRange: `${formatDisplayDate(
         lastMonthStart,
       )} - ${formatDisplayDate(today)}`,
@@ -62,8 +65,8 @@ export function getPresetRanges(): DateRangeOption[] {
     {
       key: "lastQuarter",
       label: "Last Quarter",
-      startDate: toIso(lastQuarterStart),
-      endDate: toIso(today),
+      startDate: toYYYYMMDD(lastQuarterStart),
+      endDate: toYYYYMMDD(today),
       displayRange: `${formatDisplayDate(
         lastQuarterStart,
       )} - ${formatDisplayDate(today)}`,
@@ -71,8 +74,8 @@ export function getPresetRanges(): DateRangeOption[] {
     {
       key: "lastYear",
       label: "Last Year",
-      startDate: toIso(lastYearStart),
-      endDate: toIso(today),
+      startDate: toYYYYMMDD(lastYearStart),
+      endDate: toYYYYMMDD(today),
       displayRange: `${formatDisplayDate(
         lastYearStart,
       )} - ${formatDisplayDate(today)}`,

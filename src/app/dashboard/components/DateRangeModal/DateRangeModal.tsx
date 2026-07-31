@@ -86,8 +86,8 @@ export default function DateRangeModal({
     onSelect?.();
     const params = new URLSearchParams(searchParams.toString());
     params.set("range", "custom");
-    params.set("startDate", new Date(customStart + "T00:00:00").toISOString());
-    params.set("endDate", new Date(customEnd + "T23:59:59").toISOString());
+    params.set("startDate", customStart);
+    params.set("endDate", customEnd);
 
     router.replace(`${pathname}?${params.toString()}`, {
       scroll: false,
