@@ -18,9 +18,5 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   const dashboardData = await getDashboardData(startDate, endDate);
 
-  return (
-    <DashboardPage
-      dashboardData={dashboardData}
-    />
-  );
+  return <DashboardPage dashboardData={dashboardData} />;
 }

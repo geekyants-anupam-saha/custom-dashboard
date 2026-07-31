@@ -40,8 +40,6 @@
     inset 0 1px 0 var(--border),
     inset 0 -30px 60px var(--white-3);
 
-  overflow: hidden;
-
   animation: popup 0.22s ease;
 }
 
@@ -206,9 +204,10 @@
 }
 
 .customForm {
-  padding: 16px 28px 24px;
+  padding: 16px 28px 0;
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: 28px;
 }
 
@@ -216,6 +215,43 @@
   display: flex;
   flex-direction: column;
   position: relative;
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.calendarIcon {
+  position: absolute;
+  right: 0;
+  top: 12px;
+  pointer-events: none;
+}
+
+.pickerBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+}
+
+.pickerPopover {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 12px);
+  z-index: 1000;
+  background: var(--surface);
+  border: 1px solid var(--white-18);
+  border-radius: 12px;
+  padding: 10px;
+  color: var(--primary);
+
+  @media (max-width: 768px) {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  }
 }
 
 .dateInput {
@@ -228,6 +264,8 @@
   outline: none;
   font-family: inherit;
   transition: border-color 0.2s;
+  width: 100%;
+  cursor: pointer;
 
   &::placeholder {
     color: var(--text-placeholder);
@@ -245,7 +283,7 @@
 }
 
 .applyBtn {
-  margin: 12px auto 0;
+  margin-top: auto;
   padding: 12px 36px;
   background: var(--white-10);
   border: 1px solid var(--white-20);
@@ -263,4 +301,9 @@
     background: var(--white-20);
     border-color: var(--text-placeholder);
   }
+}
+
+:global(.rdp-root) {
+  --rdp-accent-color: var(--text-muted);
+  --rdp-accent-background-color: rgba(255, 255, 255, 0.1);
 }
