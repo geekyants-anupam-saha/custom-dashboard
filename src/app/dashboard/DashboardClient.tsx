@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
 import { CalendarDays, ChevronDown, Bookmark } from "lucide-react";
 
@@ -23,7 +23,7 @@ import Instagram from "@/components/icons/Instagram";
 
 interface DashboardPageProps {
   dashboardData: {
-    lastUpdated: string;
+    lastUpdated: any;
     instagram: {
       followersCount: number;
       mostViewedPost: {
@@ -48,7 +48,6 @@ interface DashboardPageProps {
 export default function DashboardPage({
   dashboardData: initialDashboardData,
 }: DashboardPageProps) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
   const dashboardData = initialDashboardData;
