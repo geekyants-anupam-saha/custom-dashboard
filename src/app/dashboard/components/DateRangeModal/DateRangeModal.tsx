@@ -4,6 +4,9 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ArrowLeft from "@/components/icons/ArrowLeft";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/style.css";
+import { CalendarDays } from "lucide-react";
 import styles from "./DateRangeModal.module.scss";
 import { DateRangeOption, getPresetRanges } from "./dateRanges";
 
@@ -31,6 +34,8 @@ export default function DateRangeModal({
   const [view, setView] = useState<"list" | "custom">("list");
   const [customStart, setCustomStart] = useState("");
   const [customEnd, setCustomEnd] = useState("");
+  const [openStartPicker, setOpenStartPicker] = useState(false);
+  const [openEndPicker, setOpenEndPicker] = useState(false);
 
   const currentStartIso =
     searchParams.get("startDate") ??
@@ -39,7 +44,7 @@ export default function DateRangeModal({
     searchParams.get("endDate") ??
     ranges.find((r) => r.key === "lastMonth")?.endDate;
 
-  const toYYYYMMDD = (isoString?: string | null) => {
+  const toYYYYMMDD = (isoString?: string | Date | null) => {
     if (!isoString) return "";
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return "";
@@ -141,23 +146,95 @@ export default function DateRangeModal({
             <div className={styles.divider} />
             <div className={styles.customForm}>
               <div className={styles.inputGroup}>
-                <input
-                  type="date"
-                  className={styles.dateInput}
-                  value={customStart}
-                  onChange={(e) => setCustomStart(e.target.value)}
-                  placeholder="Start date"
-                />
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="text"
+                    readOnly
+                    className={styles.dateInput}
+                    value={customStart}
+                    onClick={() => {
+                      setOpenStartPicker(!openStartPicker);
+                      setOpenEndPicker(false);
+                    }}
+                    placeholder="Start date"
+                  />
+                  <CalendarDays
+                    size={18}
+                    color="var(--white-58)"
+                    className={styles.calendarIcon}
+                  />
+                  {openStartPicker && (
+                    <>
+                      <div
+                        className={styles.pickerBackdrop}
+                        onClick={() => setOpenStartPicker(false)}
+                      />
+                      <div className={styles.pickerPopover}>
+                        <DayPicker
+                          mode="single"
+                          selected={
+                            customStart
+                              ? new Date(customStart + "T00:00:00")
+                              : undefined
+                          }
+                          onSelect={(date) => {
+                            if (date) {
+                              setCustomStart(toYYYYMMDD(date));
+                            }
+                            setOpenStartPicker(false);
+                          }}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
+
               <div className={styles.inputGroup}>
-                <input
-                  type="date"
-                  className={styles.dateInput}
-                  value={customEnd}
-                  onChange={(e) => setCustomEnd(e.target.value)}
-                  placeholder="End date"
-                />
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="text"
+                    readOnly
+                    className={styles.dateInput}
+                    value={customEnd}
+                    onClick={() => {
+                      setOpenEndPicker(!openEndPicker);
+                      setOpenStartPicker(false);
+                    }}
+                    placeholder="End date"
+                  />
+                  <CalendarDays
+                    size={18}
+                    color="var(--white-58)"
+                    className={styles.calendarIcon}
+                  />
+                  {openEndPicker && (
+                    <>
+                      <div
+                        className={styles.pickerBackdrop}
+                        onClick={() => setOpenEndPicker(false)}
+                      />
+                      <div className={styles.pickerPopover}>
+                        <DayPicker
+                          mode="single"
+                          selected={
+                            customEnd
+                              ? new Date(customEnd + "T00:00:00")
+                              : undefined
+                          }
+                          onSelect={(date) => {
+                            if (date) {
+                              setCustomEnd(toYYYYMMDD(date));
+                            }
+                            setOpenEndPicker(false);
+                          }}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
+
               <button className={styles.applyBtn} onClick={applyCustom}>
                 APPLY
               </button>
