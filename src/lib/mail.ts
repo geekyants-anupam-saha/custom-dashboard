@@ -1,16 +1,39 @@
-import { Resend } from 'resend';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import mailchimpTransactional from "@mailchimp/mailchimp_transactional";
+import { otpTemplate } from "@/lib/mailTemplates/otpTemplate";
+
+const mailchimp = mailchimpTransactional(
+  process.env.MAILCHIMP_TRANSACTIONAL_API_KEY!,
+);
 
 export async function sendOtpEmail(email: string, otp: string) {
-  const resend = new Resend(process.env.EMAIL_API_KEY || '');
+  try {
+     
+    await mailchimp.messages.send({
+      message: {
+        from_email: process.env.FROM_EMAIL!,
+        from_name: process.env.FROM_NAME || "World of Us",
+        to: [
+          {
+            email,
+            type: "to",
+          },
+        ],
+        subject: "Your World of Us Dashboard Login Code",
+        html: otpTemplate(otp),
+      },
+    } as any);
 
-  const response = await resend.emails.send({
-    from: process.env.FROM_EMAIL || 'onboarding@resend.dev',
-    to: email,
-    subject: "Your WoU Dashboard verification code",
-    html: `<p>Your verification code is: <strong>${otp}</strong></p>`
-  });
+    return {
+      success: true,
+      message: "OTP sent successfully",
+    };
+  } catch (error) {
+    console.error("Mailchimp Transactional Error:", error);
 
-  console.log(response);
-
-  return response;
+    return {
+      success: false,
+      message: "Failed to send OTP",
+    };
+  }
 }

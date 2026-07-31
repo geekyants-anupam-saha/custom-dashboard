@@ -18,6 +18,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ user: { id: dbUser.id, email: dbUser.email } });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Unable to fetch session" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Unable to fetch session" },
+      { status: 500 },
+    );
   }
 }

@@ -9,33 +9,38 @@ export async function POST(request: Request) {
     const otp = typeof body?.otp === "string" ? body.otp : "";
 
     if (!email || !otp) {
-      return NextResponse.json({ error: "Email and OTP are required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Email and OTP are required" },
+        { status: 400 },
+      );
     }
 
-    if(otp !== "121212") {
-      const verification = await prisma.otpVerification.findUnique({ where: { email } });
-      if (!verification) {
-        return NextResponse.json({ error: "OTP not found" }, { status: 404 });
-      }
-  
-      console.log("otp", otp)
-      if (verification.otp !== otp) {
-        return NextResponse.json({ error: "Invalid OTP" }, { status: 401 });
-      }
+    const verification = await prisma.otpVerification.findUnique({
+      where: { email },
+    });
+    if (!verification) {
+      return NextResponse.json({ error: "OTP not found" }, { status: 404 });
     }
 
-    // if (verification.expiresAt.getTime() < Date.now()) {
-    //   return NextResponse.json({ error: "OTP expired" }, { status: 401 });
-    // }
+    if (verification.otp !== otp) {
+      return NextResponse.json({ error: "Invalid OTP" }, { status: 401 });
+    }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    if (verification.expiresAt.getTime() < Date.now()) {
+      return NextResponse.json({ error: "OTP expired" }, { status: 401 });
+    }
+
+    let user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      user = await prisma.user.create({ data: { email } });
     }
 
     const token = await createJwt({ id: user.id, email: user.email });
 
-    const response = NextResponse.json({ success: true, user: { id: user.id, email: user.email } });
+    const response = NextResponse.json({
+      success: true,
+      user: { id: user.id, email: user.email },
+    });
     response.cookies.set("auth-token", token, {
       httpOnly: true,
       sameSite: "lax",
@@ -47,6 +52,9 @@ export async function POST(request: Request) {
     return response;
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Unable to verify OTP" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Unable to verify OTP" },
+      { status: 500 },
+    );
   }
 }

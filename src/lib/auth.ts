@@ -8,11 +8,21 @@ export type AuthUser = {
 };
 
 const secret = new TextEncoder().encode(
-  process.env.JWT_SECRET ?? "local-dev-secret"
+  process.env.JWT_SECRET ?? "local-dev-secret",
 );
 
+const envDomains = process.env.NEXT_PUBLIC_ALLOWED_DOMAINS || "";
+const ALLOWED_EMAIL_DOMAINS = envDomains
+  .replace(/^\[|\]$/g, "")
+  .split(",")
+  .map((d) => d.trim())
+  .filter(Boolean);
+
 export function isValidEmail(email: string) {
-  return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/i.test(email);
+  return ALLOWED_EMAIL_DOMAINS.some((domain) => {
+    const escapedDomain = domain.replace(/\./g, "\\.");
+    return new RegExp(`^[A-Za-z0-9._%+-]+@${escapedDomain}$`, "i").test(email);
+  });
 }
 
 export function generateOtp() {
